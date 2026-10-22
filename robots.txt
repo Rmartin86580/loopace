@@ -1,0 +1,62 @@
+# Loopace — robots.txt
+# Les moteurs de recherche classiques (Google, Bing, DuckDuckGo…) peuvent indexer le site
+# pour qu'on puisse le trouver. Les robots d'intelligence artificielle (collecte de données
+# pour l'entraînement ou les réponses des assistants) ne sont pas autorisés.
+# Réservation des droits de fouille de textes et de données (directive UE 2019/790, art. 4) :
+# voir /.well-known/tdmrep.json et les balises tdm-reservation des pages.
+
+# --- OpenAI ---
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+# --- Anthropic ---
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+# --- Google (IA Gemini / Vertex, sans toucher à la recherche Google) ---
+User-agent: Google-Extended
+User-agent: GoogleOther
+User-agent: Google-CloudVertexBot
+# --- Apple (IA, sans toucher à la recherche Apple) ---
+User-agent: Applebot-Extended
+# --- Meta ---
+User-agent: meta-externalagent
+User-agent: meta-externalfetcher
+User-agent: FacebookBot
+# --- Amazon ---
+User-agent: Amazonbot
+# --- Perplexity ---
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+# --- Mistral ---
+User-agent: MistralAI-User
+# --- Microsoft / DuckDuckGo (assistants) ---
+User-agent: DuckAssistBot
+# --- Collecte de données d'entraînement ---
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: cohere-ai
+User-agent: cohere-training-data-crawler
+User-agent: Diffbot
+User-agent: AI2Bot
+User-agent: Ai2Bot-Dolma
+User-agent: ImagesiftBot
+User-agent: Omgilibot
+User-agent: Omgili
+User-agent: Timpibot
+User-agent: YouBot
+User-agent: Kangaroo Bot
+User-agent: PanguBot
+User-agent: Webzio-Extended
+User-agent: iaskspider/2.0
+User-agent: img2dataset
+User-agent: VelenPublicWebCrawler
+User-agent: ICC-Crawler
+User-agent: Brightbot 1.0
+Disallow: /
+
+# Tous les autres robots (moteurs de recherche) : autorisés
+User-agent: *
+Allow: /
