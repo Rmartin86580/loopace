@@ -12,7 +12,7 @@ Outils gratuits pour les coureurs et triathlètes : parcours, allure, séance �
 | `seance.html` / `seance.js` / `seance.css` | Séance → boucle : lit une séance (Garmin, Coros, Polar, TrainingPeaks, intervals.icu, Runna…) et trace une boucle de la bonne longueur |
 | `band.js` | Bracelet d'allure à imprimer et fond d'écran (pages Allure et Triathlon) |
 | `styles.css` | DA noir & rose commune |
-| `assets/` | Logo, texture de fond, favicon |
+| `assets/` | Logo, favicon |
 
 ## Mettre le site en ligne (GitHub Pages)
 

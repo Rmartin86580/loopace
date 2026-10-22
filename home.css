@@ -24,8 +24,7 @@
   background:
     radial-gradient(circle at 75% 40%, rgba(var(--accent-rgb), .28), transparent 45%),
     radial-gradient(circle at 10% 90%, rgba(var(--accent2-rgb), .14), transparent 40%),
-    linear-gradient(90deg, var(--black) 20%, rgba(11, 11, 12, .6) 60%, rgba(11, 11, 12, .85)),
-    url("assets/background.webp") center / cover;
+    linear-gradient(90deg, var(--black) 20%, rgba(11, 11, 12, .6) 60%, rgba(11, 11, 12, .85));
   animation: drift 30s ease-in-out infinite alternate;
 }
 .h-hero__grid {
@@ -215,7 +214,7 @@
   display: grid; place-items: center;
   width: 120px; aspect-ratio: 16 / 9;
   border-radius: 10px;
-  background: linear-gradient(160deg, rgba(var(--accent-rgb), .5), rgba(11, 11, 12, .9)), url("assets/background.webp") center / cover;
+  background: linear-gradient(160deg, rgba(var(--accent-rgb), .5), rgba(11, 11, 12, .9));
   border: 1px solid rgba(255, 255, 255, .15);
   transform: rotate(4deg);
 }
@@ -316,8 +315,7 @@
   border: 1px solid var(--line);
   background:
     radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), .3), transparent 60%),
-    linear-gradient(rgba(11, 11, 12, .7), rgba(11, 11, 12, .9)),
-    url("assets/background.webp") center / cover;
+    linear-gradient(rgba(11, 11, 12, .7), rgba(11, 11, 12, .9));
 }
 .h-final img { width: 64px; height: auto; margin-bottom: 14px; filter: drop-shadow(0 10px 30px rgba(var(--accent-rgb), .5)); animation: float 6s ease-in-out infinite; }
 .h-final h2 { font-size: clamp(2rem, 5vw, 3.2rem); }
