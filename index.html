@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loopace — Prépare ta course au mètre près</title>
+  <meta name="description" content="Loopace : trace tes parcours de course, calcule ton allure en tenant compte du dénivelé, imprime ton bracelet d'allure et crée la vidéo 3D de ta sortie. Gratuit, sans inscription.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-loop.svg">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="home.css?v=93">
+  <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
+  <link rel="stylesheet" href="theme-logo.css?v=93">
+</head>
+<body class="page-home">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lpGrad" gradientUnits="userSpaceOnUse" x1="2" y1="3" x2="22" y2="21"><stop offset="0" style="stop-color:var(--pink)"/><stop offset="1" style="stop-color:var(--lilac)"/></linearGradient></defs></svg>
+
+  <header class="nav" id="nav">
+    <a href="#accueil" class="nav__brand" aria-label="Loopace — accueil">
+      <span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span>
+    </a>
+    <nav class="nav__links" aria-label="Outils">
+      <a href="parcours.html" title="Tracer un parcours" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 19H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5" stroke-dasharray="2.4 3.2"/><circle cx="5.5" cy="19" r="2"/><circle cx="18" cy="5" r="2.6" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Tracer un parcours</span><span class="nav__short">Parcours</span></a>
+      <a href="allure.html" title="Calculer mon allure" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="translate(1.5 0)"><circle cx="13" cy="13.5" r="7.5"/><path d="M13 10v3.5l2.5 1.5M11 2.5h4M13 2.5V6"/><path d="M1 11h2.5M0 15h2.5" opacity=".7"/></g></svg><span class="nav__full">Calculer mon allure</span><span class="nav__short">Allure</span></a>
+      <a href="seance.html" title="Séance → boucle" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h4v-5h4v5h3V7h4v11h5"/><circle cx="15" cy="3.5" r="1.4" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Séance → boucle</span><span class="nav__short">Séance</span></a>
+      <a href="triathlon.html" title="Planificateur triathlon" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2.2-2.8-3.8-4.5-6-4.5a4.5 4.5 0 0 0 0 9c2.2 0 3.8-1.7 6-4.5zm0 0c2.2 2.8 3.8 4.5 6 4.5a4.5 4.5 0 0 0 0-9c-2.2 0-3.8 1.7-6 4.5z"/></svg><span class="nav__full">Triathlon</span><span class="nav__short">Tri</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="h-hero" id="accueil">
+      <div class="h-hero__bg" aria-hidden="true"></div>
+      <div class="container h-hero__grid">
+        <div class="h-hero__text">
+          <p class="h-pill reveal"><span></span> Gratuit · Sans inscription</p>
+          <h1 class="reveal">Prépare ta course <span class="grad">au mètre près.</span></h1>
+          <p class="h-hero__lead reveal">Trace ton parcours, connais chaque montée, et cours à la bonne allure du départ à l'arrivée. Loopace calcule tes temps de passage <strong>en tenant compte du dénivelé</strong>.</p>
+          <div class="h-hero__actions reveal">
+            <a href="parcours.html" class="btn btn--big">Tracer mon parcours</a>
+            <a href="allure.html" class="btn btn--ghost btn--big">Calculer mon allure</a>
+          </div>
+          <ul class="h-hero__proof reveal">
+            <li><strong>Carte</strong> OpenStreetMap</li>
+            <li><strong>GPX</strong> Garmin, Coros, Strava</li>
+            <li><strong>Vidéo 3D</strong> MP4</li>
+          </ul>
+        </div>
+
+        <!-- Maquette animée de l'outil -->
+        <div class="h-mock reveal" aria-hidden="true">
+          <div class="h-mock__window">
+            <div class="h-mock__bar"><span></span><span></span><span></span><em>loopace · parcours</em></div>
+            <div class="h-mock__map">
+              <svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice">
+                <defs>
+                  <linearGradient id="hRoute" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0" style="stop-color: var(--pink)"/><stop offset="1" style="stop-color: var(--lilac)"/>
+                  </linearGradient>
+                </defs>
+                <!-- rues stylisées -->
+                <g class="h-streets">
+                  <path d="M0 60 C80 70 160 40 240 55 S360 80 400 70"/>
+                  <path d="M0 160 C90 150 170 180 260 165 S360 140 400 150"/>
+                  <path d="M70 0 C80 80 60 160 90 260"/>
+                  <path d="M200 0 C190 90 220 170 205 260"/>
+                  <path d="M320 0 C330 70 300 170 330 260"/>
+                  <path d="M0 220 C120 210 240 235 400 215"/>
+                </g>
+                <path class="h-route-glow" d="M40 215 C80 190 60 140 120 128 S200 160 228 108 S300 50 352 78 S370 150 330 175"/>
+                <path id="hRoutePath" class="h-route" d="M40 215 C80 190 60 140 120 128 S200 160 228 108 S300 50 352 78 S370 150 330 175"/>
+                <circle class="h-start" cx="40" cy="215" r="7"/>
+                <circle class="h-runner" r="7">
+                  <animateMotion dur="7s" repeatCount="indefinite" rotate="auto">
+                    <mpath href="#hRoutePath"/>
+                  </animateMotion>
+                </circle>
+              </svg>
+              <div class="h-mock__stat h-mock__stat--a"><span>Distance</span><strong>12,4 km</strong></div>
+              <div class="h-mock__stat h-mock__stat--b"><span>D+</span><strong>186 m</strong></div>
+            </div>
+            <div class="h-mock__profile">
+              <svg viewBox="0 0 300 60" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="hProf" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" style="stop-color: var(--pink)" stop-opacity=".5"/><stop offset="1" style="stop-color: var(--pink)" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <path d="M0 50 L30 46 L60 40 L90 22 L120 14 L150 20 L180 34 L210 30 L240 18 L270 26 L300 38 L300 60 L0 60Z" fill="url(#hProf)"/>
+                <path d="M0 50 L30 46 L60 40 L90 22 L120 14 L150 20 L180 34 L210 30 L240 18 L270 26 L300 38" fill="none" style="stroke: var(--pink)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- Bracelet d'allure flottant -->
+          <div class="h-band">
+            <div class="h-band__head"><small>Objectif</small><strong>58:30</strong></div>
+            <ol>
+              <li><span>1</span><em>4:41</em><b>4:41</b></li>
+              <li class="up"><span>2 ▲</span><em>5:12</em><b>9:53</b></li>
+              <li class="up"><span>3 ▲</span><em>5:20</em><b>15:13</b></li>
+              <li><span>4</span><em>4:39</em><b>19:52</b></li>
+              <li class="down"><span>5 ▼</span><em>4:22</em><b>24:14</b></li>
+              <li><span>6</span><em>4:40</em><b>28:54</b></li>
+            </ol>
+          </div>
+
+          <!-- Carte allure flottante -->
+          <div class="h-chip">
+            <span>Allure à tenir</span>
+            <strong>4:43 <small>/km</small></strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== OUTILS ===== -->
+    <section class="section" id="outils">
+      <div class="container">
+        <div class="h-head reveal">
+          <p class="eyebrow">Les outils</p>
+          <h2>Tout ce qu'il faut <span class="grad">avant le départ</span></h2>
+          <p>Trois outils qui se parlent : ce que tu traces sur la carte se retrouve dans le calculateur, puis sur ton poignet.</p>
+        </div>
+
+        <div class="h-tools">
+          <a class="h-tool h-tool--big reveal" href="parcours.html">
+            <div class="h-tool__visual h-tool__visual--map" aria-hidden="true">
+              <svg viewBox="0 0 300 160" preserveAspectRatio="xMidYMid slice">
+                <path class="h-streets-sm" d="M0 40 C80 50 160 20 300 40 M0 120 C100 110 200 140 300 120 M60 0 C70 60 50 110 70 160 M200 0 C190 60 220 110 210 160"/>
+                <path class="h-route-sm" d="M30 130 C60 110 50 70 100 64 S170 90 190 52 S260 30 270 80"/>
+                <circle cx="30" cy="130" r="5" style="fill: var(--pink)"/>
+                <circle cx="270" cy="80" r="5" fill="#fff" style="stroke: var(--pink)" stroke-width="2"/>
+              </svg>
+            </div>
+            <div class="h-tool__body">
+              <span class="h-tool__tag">Parcours</span>
+              <h3>Trace ton parcours</h3>
+              <p>Clique sur la carte : le tracé suit les routes et sentiers. Distance, D+, profil d'altitude, boucle ou aller-retour, export GPX pour ta montre.</p>
+              <span class="h-tool__link">Ouvrir la carte →</span>
+            </div>
+          </a>
+
+          <a class="h-tool reveal" href="allure.html">
+            <div class="h-tool__visual h-tool__visual--pace" aria-hidden="true">
+              <div class="h-pace">
+                <span>Semi-marathon</span>
+                <strong>1:45:08</strong>
+                <em>4:59 /km · 12 km/h</em>
+              </div>
+            </div>
+            <div class="h-tool__body">
+              <span class="h-tool__tag">Allure</span>
+              <h3>Calcule ton allure</h3>
+              <p>Temps, allure ou distance : entre deux valeurs, on calcule la troisième. Course, natation, vélo, et prédiction de tes chronos.</p>
+              <span class="h-tool__link">Ouvrir le calculateur →</span>
+            </div>
+          </a>
+
+          <a class="h-tool reveal" href="allure.html#routeSection">
+            <div class="h-tool__visual h-tool__visual--share" aria-hidden="true">
+              <div class="h-mini-band">
+                <i></i><i></i><i class="hl"></i><i></i><i></i>
+              </div>
+              <div class="h-mini-video"><span>▶</span></div>
+            </div>
+            <div class="h-tool__body">
+              <span class="h-tool__tag">Partage</span>
+              <h3>Bracelet &amp; vidéo 3D</h3>
+              <p>Imprime ton bracelet d'allure ou mets-le en fond d'écran, et crée la vidéo de survol 3D de ton parcours pour ton club.</p>
+              <span class="h-tool__link">Créer mon bracelet →</span>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== LA DIFFÉRENCE ===== -->
+    <section class="section section--alt" id="difference">
+      <div class="container h-diff">
+        <div class="h-diff__text reveal">
+          <p class="eyebrow">Pourquoi Loopace</p>
+          <h2>Ton allure, <span class="grad">montée comprise.</span></h2>
+          <p>Les calculateurs classiques te donnent une allure constante, comme si le parcours était plat. Sur le terrain, une côte à 8 % te coûte plus de 25 % de temps.</p>
+          <ul class="h-checks">
+            <li>Chaque kilomètre ajusté selon sa pente réelle</li>
+            <li>L'effort réparti pour tenir ton objectif sans exploser dans les côtes</li>
+            <li>Tes temps de passage prêts à imprimer ou sur ton téléphone</li>
+          </ul>
+          <a href="allure.html#routeSection" class="btn">Essayer sur mon parcours</a>
+        </div>
+
+        <div class="h-diff__visual reveal" aria-hidden="true">
+          <div class="h-bars">
+            <div class="h-bars__head"><span>Allure par km</span><span>10 km en 47:40</span></div>
+            <div class="h-bars__grid">
+              <div style="--h:42%"><b>4:41</b><span>1</span></div>
+              <div class="up" style="--h:78%"><b>5:12</b><span>2</span></div>
+              <div class="up" style="--h:86%"><b>5:20</b><span>3</span></div>
+              <div style="--h:40%"><b>4:39</b><span>4</span></div>
+              <div class="down" style="--h:18%"><b>4:22</b><span>5</span></div>
+              <div style="--h:41%"><b>4:40</b><span>6</span></div>
+              <div class="up" style="--h:62%"><b>5:01</b><span>7</span></div>
+              <div style="--h:38%"><b>4:37</b><span>8</span></div>
+              <div class="down" style="--h:22%"><b>4:25</b><span>9</span></div>
+              <div style="--h:44%"><b>4:43</b><span>10</span></div>
+            </div>
+            <div class="h-bars__legend"><span class="up">▲ montée</span><span class="down">▼ descente</span><span>moyenne 4:46 /km</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== COMMENT ÇA MARCHE ===== -->
+    <section class="section" id="comment">
+      <div class="container">
+        <div class="h-head reveal">
+          <p class="eyebrow">Comment ça marche</p>
+          <h2>Prêt en <span class="grad">trois étapes</span></h2>
+        </div>
+        <ol class="h-steps">
+          <li class="reveal"><span>1</span><h3>Trace</h3><p>Cherche ta ville et clique sur la carte pour dessiner ta sortie ou le parcours de ta course.</p></li>
+          <li class="reveal"><span>2</span><h3>Vise</h3><p>Indique ton objectif de temps ou d'allure : on répartit l'effort selon le dénivelé.</p></li>
+          <li class="reveal"><span>3</span><h3>Cours</h3><p>Envoie le GPX sur ta montre, imprime ton bracelet et pars à la bonne allure.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ===== BIENTÔT ===== -->
+    <section class="section section--alt" id="bientot">
+      <div class="container h-soon reveal">
+        <div>
+          <p class="eyebrow">Bientôt sur Loopace</p>
+          <h2>Et ce n'est <span class="grad">que le début</span></h2>
+        </div>
+        <ul class="h-soon__list">
+          <li><strong>Partenaire virtuel</strong><span>Ton plan d'allure directement sur ta montre</span></li>
+          <li class="h-soon__ready"><a href="seance.html"><strong>Séance → boucle <em>Disponible</em></strong><span>Colle ta séance, on trace la boucle qui va avec →</span></a></li>
+          <li class="h-soon__ready"><a href="triathlon.html"><strong>Planificateur triathlon <em>Disponible</em></strong><span>Natation, vélo, course et transitions →</span></a></li>
+          <li><strong>Partage de parcours</strong><span>Un lien pour envoyer ta sortie au club</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== APPEL FINAL ===== -->
+    <section class="section">
+      <div class="container">
+        <div class="h-final reveal">
+          <img src="assets/logo-loop.svg" alt="" width="72" height="72">
+          <h2>Ta prochaine boucle <span class="grad">commence ici.</span></h2>
+          <p>Gratuit, sans inscription, directement dans ton navigateur.</p>
+          <div class="h-hero__actions">
+            <a href="parcours.html" class="btn btn--big">Tracer mon parcours</a>
+            <a href="allure.html" class="btn btn--ghost btn--big">Calculer mon allure</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="h-footer">
+    <div class="container h-footer__grid">
+      <div class="h-footer__brand">
+        <a href="#accueil" class="nav__brand"><span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span></a>
+        <p>Prépare ta course au mètre près.</p>
+      </div>
+      <nav class="h-footer__links" aria-label="Outils">
+        <strong>Outils</strong>
+        <a href="parcours.html">Tracer un parcours</a>
+        <a href="allure.html">Calculateur d'allure</a>
+        <a href="allure.html#routeSection">Bracelet d'allure</a>
+        <a href="triathlon.html">Planificateur triathlon</a>
+      </nav>
+      <div class="h-footer__links">
+        <strong>Contact</strong>
+        <a href="mailto:contact@loopace.app">contact@loopace.app</a>
+        <span>Une idée, un bug ? Écris-nous.</span>
+      </div>
+    </div>
+    <div class="container h-footer__bottom">
+      <span>© <span id="year"></span> Loopace</span>
+      <span>Cartes © OpenStreetMap · Imagerie © Esri</span>
+    </div>
+  </footer>
+
+  <script src="script.js?v=93"></script>
+</body>
+</html>

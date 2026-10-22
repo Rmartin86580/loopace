@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculateur d'allure — Loopace</title>
+  <meta name="description" content="Calcule ton allure, ton temps ou ta distance en course à pied, natation et vélo. Temps de passage et prédiction de chronos. Gratuit.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-loop.svg">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="allure.css?v=93">
+  <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
+  <link rel="stylesheet" href="theme-logo.css?v=93">
+</head>
+<body class="page-tool">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lpGrad" gradientUnits="userSpaceOnUse" x1="2" y1="3" x2="22" y2="21"><stop offset="0" style="stop-color:var(--pink)"/><stop offset="1" style="stop-color:var(--lilac)"/></linearGradient></defs></svg>
+
+  <header class="nav" id="nav">
+    <a href="index.html" class="nav__brand" aria-label="Loopace — accueil">
+      <span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span>
+    </a>
+    <nav class="nav__links" aria-label="Outils">
+      <a href="parcours.html" title="Tracer un parcours" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 19H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5" stroke-dasharray="2.4 3.2"/><circle cx="5.5" cy="19" r="2"/><circle cx="18" cy="5" r="2.6" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Tracer un parcours</span><span class="nav__short">Parcours</span></a>
+      <a href="allure.html" title="Calculer mon allure" class="nav__link is-active" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="translate(1.5 0)"><circle cx="13" cy="13.5" r="7.5"/><path d="M13 10v3.5l2.5 1.5M11 2.5h4M13 2.5V6"/><path d="M1 11h2.5M0 15h2.5" opacity=".7"/></g></svg><span class="nav__full">Calculer mon allure</span><span class="nav__short">Allure</span></a>
+      <a href="seance.html" title="Séance → boucle" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h4v-5h4v5h3V7h4v11h5"/><circle cx="15" cy="3.5" r="1.4" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Séance → boucle</span><span class="nav__short">Séance</span></a>
+      <a href="triathlon.html" title="Planificateur triathlon" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2.2-2.8-3.8-4.5-6-4.5a4.5 4.5 0 0 0 0 9c2.2 0 3.8-1.7 6-4.5zm0 0c2.2 2.8 3.8 4.5 6 4.5a4.5 4.5 0 0 0 0-9c-2.2 0-3.8 1.7-6 4.5z"/></svg><span class="nav__full">Triathlon</span><span class="nav__short">Tri</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="tool-hero">
+      <div class="container">
+        <p class="eyebrow">Outil</p>
+        <h1>Calculateur <span class="grad">d'allure</span></h1>
+        <p>Entre deux valeurs, on calcule la troisième. Pour la course à pied, la natation et le vélo.</p>
+      </div>
+    </section>
+
+    <section class="container tool-grid">
+      <!-- Calculateur -->
+      <div class="card calc">
+        <div class="seg seg--sport" role="group" aria-label="Sport">
+          <button data-sport="run" aria-pressed="true">
+            <svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9 1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" stroke="none" transform="translate(2.5 0)"/><path d="M1 9.5h3M0 13.5h3" fill="none" opacity=".7"/></svg>
+            Course
+          </button>
+          <button data-sport="swim" aria-pressed="false">
+            <svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" aria-hidden="true"><circle cx="16.5" cy="5.5" r="2.5"/><path d="M8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><path d="M22 16.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36s-.78.13-1.15.36c-.47.27-1.09.64-2.2.64v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36v2zM22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.08.64-2.19.64-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36c-.46.27-1.08.64-2.19.64v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2z"/></svg>
+            Natation
+          </button>
+          <button data-sport="bike" aria-pressed="false">
+            <svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5zm5.8-10 2.4-2.4.8.8c1.3 1.3 3 2.1 5.1 2.1V9c-1.5 0-2.7-.6-3.6-1.5l-1.9-1.9c-.5-.4-1-.6-1.6-.6s-1.1.2-1.4.6L7.8 8.4c-.4.4-.6.9-.6 1.4 0 .6.2 1.1.6 1.4L11 14v5h2v-6.2l-2.2-2.3zM19 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z" stroke="none" transform="translate(3.6 2.8) scale(.85)"/><path d="M1 8.5h3M0 12h3" fill="none" opacity=".7"/></svg>
+            Vélo
+          </button>
+        </div>
+
+        <div class="calc__target">
+          <span>Je veux calculer</span>
+          <div class="seg seg--small" role="group" aria-label="Valeur à calculer">
+            <button data-target="time" aria-pressed="true">mon temps</button>
+            <button data-target="pace" aria-pressed="false" id="targetPaceBtn">mon allure</button>
+            <button data-target="dist" aria-pressed="false">ma distance</button>
+          </div>
+        </div>
+
+        <div class="fields">
+          <div class="field" data-field="dist">
+            <label for="dist">Distance</label>
+            <div class="field__input">
+              <input id="dist" type="text" inputmode="decimal" autocomplete="off">
+              <em id="distUnit">km</em>
+            </div>
+            <div class="chips" id="presets"></div>
+          </div>
+          <div class="field" data-field="time">
+            <label for="time">Temps</label>
+            <div class="field__input">
+              <input id="time" type="text" inputmode="numeric" autocomplete="off" placeholder="h:mm:ss">
+            </div>
+            <small>ex : 45:30 ou 1:45:00</small>
+          </div>
+          <div class="field" data-field="pace">
+            <label for="pace" id="paceLabel">Allure</label>
+            <div class="field__input">
+              <input id="pace" type="text" inputmode="numeric" autocomplete="off">
+              <em id="paceUnit">/km</em>
+            </div>
+            <small id="paceHint">ex : 5:30</small>
+          </div>
+        </div>
+
+        <div class="result" id="result" aria-live="polite">
+          <span class="result__label" id="resLabel"></span>
+          <strong class="result__main" id="resMain">—</strong>
+          <div class="result__extra" id="resExtra"></div>
+        </div>
+      </div>
+
+      <!-- Temps de passage -->
+      <div class="card splits">
+        <h2>Temps de passage</h2>
+        <p class="card__hint" id="splitsHint"></p>
+        <div class="split-step">
+          <span class="split-step__label">Passage tous les</span>
+          <div class="chips chips--step" role="group" aria-label="Intervalle des temps de passage">
+            <span id="stepChips" class="chips__presets"></span>
+            <!-- Pastille « Autre » : on y tape une valeur personnalisée -->
+            <label class="chip-custom" id="stepCustom" title="Autre intervalle">
+              <input id="stepInput" type="text" inputmode="decimal" autocomplete="off" placeholder="Autre" aria-label="Autre intervalle">
+              <em id="stepUnit">km</em>
+            </label>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="splits">
+            <thead><tr><th>Distance</th><th>Temps</th><th>Allure</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <button class="btn splits__band" id="calcBandBtn" disabled>
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M10 7h4M10 11h4M10 15h4"/></svg>
+          Créer mon bracelet d'allure
+        </button>
+      </div>
+    </section>
+
+    <!-- Prédiction (course à pied) -->
+    <section class="container tool-section" id="predictSection">
+      <div class="card predict">
+        <div class="predict__head">
+          <div>
+            <h2>Prédire mes chronos</h2>
+            <p class="card__hint">À partir d'une course que tu as faite, estime ton temps sur les autres distances.</p>
+          </div>
+          <div class="predict__inputs">
+            <div class="field">
+              <label for="refDist">Ma course de référence</label>
+              <div class="field__input field__input--select">
+                <select id="refDist">
+                  <option value="5000">5 km</option>
+                  <option value="10000" selected>10 km</option>
+                  <option value="21097.5">Semi-marathon</option>
+                  <option value="42195">Marathon</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="refTime">Mon temps</label>
+              <div class="field__input">
+                <input id="refTime" type="text" inputmode="numeric" autocomplete="off" value="50:00" placeholder="h:mm:ss">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="predict__grid" id="predictGrid"></div>
+        <p class="card__hint predict__note">Estimation par la formule de Riegel : elle suppose un entraînement adapté à chaque distance. Sur marathon, compte souvent quelques minutes de plus.</p>
+      </div>
+    </section>
+
+    <!-- Prédiction sur un parcours enregistré (avec dénivelé) -->
+    <section class="container tool-section" id="routeSection">
+      <div class="card route-predict">
+        <div>
+          <h2>Prédire sur mon parcours</h2>
+          <p class="card__hint">Choisis un de tes parcours enregistrés, indique le temps ou l'allure que tu vises : on te donne les temps de passage à chaque kilomètre, en tenant compte des montées et des descentes.</p>
+        </div>
+
+        <div class="rp-empty" id="rpEmpty" hidden>
+          <p id="rpEmptyText">Tu n'as pas encore de parcours enregistré dans ce navigateur.</p>
+          <a class="btn" href="parcours.html">Créer un parcours</a>
+        </div>
+
+        <div class="rp-body" id="rpBody">
+          <div class="rp-inputs">
+            <div class="field">
+              <label for="rpRoute">Parcours</label>
+              <div class="field__input field__input--select">
+                <select id="rpRoute"></select>
+              </div>
+            </div>
+            <div class="field">
+              <span class="field__label">Mon objectif</span>
+              <div class="seg seg--small" role="group" aria-label="Type d'objectif">
+                <button data-goal="time" aria-pressed="true">un temps</button>
+                <button data-goal="pace" aria-pressed="false" id="rpGoalPaceBtn">une allure</button>
+                <button data-goal="ref" aria-pressed="false" id="rpGoalRefBtn">estimer</button>
+              </div>
+              <small id="rpGoalHint"></small>
+            </div>
+            <div class="field" id="rpGoalField">
+              <label for="rpGoal" id="rpGoalLabel">Temps visé</label>
+              <div class="field__input">
+                <input id="rpGoal" type="text" inputmode="numeric" autocomplete="off">
+                <em id="rpGoalUnit"></em>
+              </div>
+            </div>
+          </div>
+
+          <div class="rp-status card__hint" id="rpStatus" hidden></div>
+          <p class="rp-approx" id="rpApprox" hidden>Profil approximatif : le service d'itinéraire n'a pas répondu, les montées et descentes ont été estimées en ligne droite entre tes points. Rouvre ce parcours dans l'outil <a href="parcours.html">Parcours</a> et enregistre-le à nouveau pour un résultat exact.</p>
+
+          <div class="rp-results" id="rpResults">
+            <div class="result rp-result">
+              <span class="result__label" id="rpResultLabel">Temps visé</span>
+              <strong class="result__main" id="rpTime">—</strong>
+              <div class="result__extra" id="rpExtra"></div>
+            </div>
+            <div class="rp-profile">
+              <div class="rp-profile__head"><span>Profil du parcours</span><span id="rpProfileInfo"></span></div>
+              <svg id="rpProfile" viewBox="0 0 300 100" preserveAspectRatio="none" aria-label="Profil d'altitude du parcours"></svg>
+            </div>
+          </div>
+
+          <div class="table-wrap rp-table">
+            <table>
+              <thead><tr><th>Km</th><th>Pente</th><th id="rpPaceHead">Allure à tenir</th><th>Passage</th></tr></thead>
+              <tbody id="rpSplits"></tbody>
+            </table>
+          </div>
+          <div class="band-cta">
+            <div>
+              <strong>Ton bracelet d'allure</strong>
+              <span>Tes temps de passage à imprimer et scotcher au poignet, ou en fond d'écran de téléphone.</span>
+            </div>
+            <button class="btn" id="bandBtn" disabled>
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M10 7h4M10 11h4M10 15h4"/></svg>
+              Créer mon bracelet
+            </button>
+          </div>
+          <p class="card__hint predict__note" id="rpNote">L'effort est réparti selon la pente : environ +3,3 % de temps par % de pente en montée ; en descente on gagne jusqu'à −10 %, au-delà le gain diminue (descente trop raide). Une estimation, pas une promesse&nbsp;!</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bracelet d'allure -->
+  <dialog class="band-modal" id="bandModal" aria-labelledby="bandTitle">
+    <div class="band-modal__head">
+      <div>
+        <p class="eyebrow">Bracelet d'allure</p>
+        <h2 id="bandTitle">Emporte ton plan de course</h2>
+      </div>
+      <button class="icon-btn" id="bandClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="band-grid">
+      <section class="band-option">
+        <div class="band-preview band-preview--band" id="bandPreview"></div>
+        <div class="band-option__text">
+          <h3>À imprimer</h3>
+          <p>Une bande de <span id="bandSize"></span> à découper et scotcher au poignet ou à l'avant-bras. Imprime à <strong>100 %</strong> (taille réelle).</p>
+          <div class="band-option__actions">
+            <button class="btn" id="bandPrint">Imprimer</button>
+            <button class="btn btn--ghost" id="bandDownload">Télécharger (PNG)</button>
+          </div>
+        </div>
+      </section>
+      <section class="band-option">
+        <div class="band-preview band-preview--wall" id="wallPreview"></div>
+        <div class="band-option__text">
+          <h3>Fond d'écran</h3>
+          <p>Mets-le en fond d'écran de verrouillage : tes passages en un coup d'œil pendant la course. ▲ montée, ▼ descente.</p>
+          <div class="band-option__actions">
+            <button class="btn" id="wallDownload">Télécharger (PNG)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </dialog>
+
+  <footer class="footer">
+    <img src="assets/logo-loop.svg" alt="" width="22" height="22">
+    <span>© <span id="year"></span> Loopace · Une idée, un bug&nbsp;? <a href="mailto:contact@loopace.app">contact@loopace.app</a></span>
+  </footer>
+
+  <script src="script.js?v=93"></script>
+  <script src="allure.js?v=93"></script>
+  <script src="band.js?v=93"></script>
+</body>
+</html>

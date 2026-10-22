@@ -1,0 +1,226 @@
+/* =========================================================
+   PLANIFICATEUR TRIATHLON (complète styles.css + allure.css)
+   ========================================================= */
+.tri { display: grid; gap: 20px; padding-bottom: 80px; }
+.tri-block { display: grid; gap: 18px; }
+.tri-block h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 1.3rem; }
+.tri-step {
+  display: grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--grad); color: var(--on-accent);
+  font-size: .85rem;
+}
+.tri-note { margin: 0; }
+.tri-note a { color: var(--pink); text-decoration: underline; }
+
+/* Couleurs des disciplines (frise, pastilles) */
+.tri-block { --c-swim: var(--pink); --c-bike: var(--lilac); --c-run: color-mix(in srgb, var(--pink), var(--lilac)); --c-t: #4a444f; }
+
+/* ----- 1. Format ----- */
+.tri-formats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.tri-format {
+  display: grid; gap: 4px; text-align: left;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--black);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.tri-format:hover { border-color: rgba(var(--accent-rgb), .5); }
+.tri-format strong { font-family: var(--font-display); font-size: 1.15rem; }
+.tri-format strong em { font: 600 .78rem var(--font-body); color: var(--muted); margin-left: 4px; }
+.tri-format span { font-size: .78rem; color: var(--muted); }
+.tri-format[aria-pressed="true"] { border-color: var(--pink); background: rgba(var(--accent-rgb), .1); }
+.tri-format[aria-pressed="true"] strong em { color: var(--pink); }
+
+/* ----- 2. Les étapes ----- */
+.tri-legs { display: grid; gap: 10px; --leg-cols: 190px repeat(4, minmax(0, 1fr)); }
+.tri-legs__head {
+  display: grid; grid-template-columns: var(--leg-cols); gap: 14px;
+  padding: 0 17px;
+  font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+}
+.tri-leg {
+  display: grid;
+  grid-template-columns: var(--leg-cols);
+  gap: 14px;
+  align-items: start;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--black);
+}
+.tri-leg--transition { padding-block: 10px; background: transparent; border-style: dashed; }
+.tri-leg__name { display: flex; align-items: center; gap: 12px; align-self: center; }
+.tri-leg__name strong { font-family: var(--font-display); font-size: 1rem; }
+.tri-leg__icon {
+  display: grid; place-items: center; flex: none;
+  width: 42px; height: 42px; border-radius: 12px;
+  background: rgba(var(--accent-rgb), .12); color: var(--pink);
+}
+.tri-leg__icon svg { width: 22px; height: 22px; }
+.tri-leg__icon--t { background: var(--black-3); color: var(--muted); font: 800 .8rem var(--font-display); }
+.tri-leg .field { min-width: 0; }
+.tri-leg .field label { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.tri-leg .field__input input,
+.tri-leg .field__input select { font-size: 1.05rem; padding: 10px 12px; min-width: 0; width: 100%; }
+.tri-leg .field__input--select select { font: 600 .9rem var(--font-body); padding-right: 32px; }
+.tri-leg .field__input em { padding-right: 12px; font-size: .8rem; }
+.tri-leg .field small { font-size: .74rem; color: var(--pink); }
+.tri-leg .field.is-locked .field__input { background: rgba(var(--accent-rgb), .08); border-color: transparent; }
+.tri-leg .field.is-locked input { color: var(--pink); }
+/* Les libellés sont dans l'en-tête sur grand écran */
+.tri-leg .field > label { display: none; }
+/* Champ calculé automatiquement (l'autre a été rempli) : texte grisé, toujours modifiable */
+.tri-leg .field.is-computed input { color: var(--muted); }
+.tri-leg .field.is-computed input:focus { color: var(--text); }
+
+/* ----- 3. Résultat ----- */
+.tri-result__top { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
+.tri-total .result__main { font-size: clamp(2.6rem, 7vw, 4rem); }
+.tri-clock {
+  display: grid; gap: 16px; align-content: center;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--black);
+}
+.tri-clock input[type="time"] { color-scheme: dark; font: 700 1.2rem var(--font-display); padding: 10px 12px; }
+.tri-clock__arrival { display: grid; gap: 2px; }
+.tri-clock__arrival span { font-size: .78rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tri-clock__arrival strong { font-family: var(--font-display); font-size: 2rem; color: var(--pink); }
+
+.tri-sum { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tri-sum:empty { display: none; }
+.tri-sum__item { display: grid; gap: 4px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--black); }
+.tri-sum__item span { display: flex; align-items: center; font-size: .8rem; font-weight: 600; color: var(--muted); }
+.tri-sum__item .tri-dot { margin-right: 8px; }
+.tri-sum__item em { margin-left: auto; font-style: normal; font-weight: 500; }
+.tri-sum__item strong { font-family: var(--font-display); font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+.tri-sum__item small { font-size: .8rem; color: var(--muted); }
+.tri-bar { display: flex; height: 56px; border-radius: 14px; overflow: hidden; gap: 2px; }
+.tri-bar__seg {
+  display: grid; align-content: center; padding: 0 10px;
+  min-width: 4px;
+  color: #fff; font-size: .75rem;
+  overflow: hidden; white-space: nowrap;
+}
+.tri-bar__seg span { opacity: .85; }
+.tri-bar__seg b { font-variant-numeric: tabular-nums; }
+.tri-bar__seg--swim { background: var(--c-swim); }
+.tri-bar__seg--bike { background: var(--c-bike); }
+.tri-bar__seg--run { background: var(--c-run); }
+.tri-bar__seg--t1,
+.tri-bar__seg--t2 { background: var(--c-t); }
+
+.tri-table { max-height: none; min-height: 0; }
+.tri-table > table { position: static; }
+.tri-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+.tri-dot--swim { background: var(--c-swim); }
+.tri-dot--bike { background: var(--c-bike); }
+.tri-dot--run { background: var(--c-run); }
+.tri-dot--t1, .tri-dot--t2 { background: var(--c-t); }
+
+/* ----- Champs à corriger / valeurs étonnantes ----- */
+.tri-leg .field.is-invalid .field__input,
+.tri-leg .field.is-invalid.is-computed .field__input { border-color: #ff5a5a; background: rgba(255, 90, 90, .06); }
+.tri-leg .field.is-warn .field__input { border-color: #ffb547; }
+.tri-leg .field small.field__warn { color: #ffb547; line-height: 1.35; }
+.tri-format-note { margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(var(--accent-rgb), .08); color: var(--text); }
+
+/* ----- Bracelet, fiche et partage ----- */
+.tri-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.tri-actions .btn { gap: 8px; border: 0; cursor: pointer; font: 600 .92rem var(--font-body); }
+.tri-actions .btn--ghost { border: 1px solid var(--line); }
+.tri-actions .btn:disabled { opacity: .45; cursor: not-allowed; }
+.tri-actions svg { width: 18px; height: 18px; }
+.tri-share-msg { margin: 0; color: var(--pink); }
+
+/* ----- Objectif global ----- */
+.tri-goal {
+  display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1.1fr) auto; gap: 14px; align-items: end;
+  padding: 16px; border-radius: 16px;
+  border: 1px dashed rgba(var(--accent-rgb), .45); background: rgba(var(--accent-rgb), .05);
+}
+.tri-goal__text { display: grid; gap: 2px; align-self: center; }
+.tri-goal__text span { font-size: .82rem; color: var(--muted); }
+.tri-goal .field { min-width: 0; }
+.tri-goal .field label { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.tri-goal .field__input input, .tri-goal .field__input select { font-size: 1rem; padding: 10px 12px; min-width: 0; width: 100%; }
+.tri-goal .field__input--select select { font: 600 .9rem var(--font-body); padding-right: 32px; }
+.tri-goal .btn { border: 0; cursor: pointer; font: 600 .95rem var(--font-body); padding: .75em 1.4em; }
+.tri-goal__msg { grid-column: 1 / -1; margin: 0; }
+.tri-goal__msg:empty { display: none; }
+.tri-goal__msg.is-error { color: #ff5a5a; }
+@media (max-width: 860px) {
+  .tri-goal { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tri-goal__text { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .tri-goal { grid-template-columns: minmax(0, 1fr); }
+}
+
+.band-part { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 18px 0 16px; }
+.band-part > span { font-size: .85rem; font-weight: 600; color: var(--muted); }
+.band-part .seg { flex-wrap: wrap; border-radius: 16px; max-width: 100%; }
+@media (max-width: 560px) {
+  .band-part .seg { display: grid; grid-template-columns: 1fr; width: 100%; }
+}
+
+/* ----- 4. Passages détaillés ----- */
+.tri-detail__bar { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; }
+.tri-detail__step { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tri-detail__step > span { font-size: .85rem; font-weight: 600; color: var(--muted); }
+#detailHint { margin: 0; }
+#detailHint:empty { display: none; }
+.tri-detail .tri-table { max-height: 460px; }
+.tri-detail th { z-index: 1; }
+.tri-grade { margin-left: 6px; font-size: .7em; }
+.tri-grade--up { color: #ff9a8a; }
+.tri-grade--down { color: #7dd3c0; }
+
+/* ----- 5. Ravitaillement ----- */
+.tri-fuel__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.tri-fuel__stat { display: grid; gap: 4px; align-content: start; padding: 16px; border-radius: 14px; border: 1px solid var(--line); background: var(--black); }
+.tri-fuel__stat span { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tri-fuel__stat strong { font-family: var(--font-display); font-size: 1.5rem; }
+.tri-fuel__stat small { font-size: .78rem; color: var(--muted); }
+.tri-fuel__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tri-fuel__list li {
+  display: grid; grid-template-columns: 62px auto minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--black);
+}
+.tri-fuel__list .tri-dot { margin: 0; }
+.tri-fuel__list time { font-family: var(--font-display); font-weight: 700; font-variant-numeric: tabular-nums; }
+.tri-fuel__list strong { display: block; font-size: .9rem; }
+.tri-fuel__list span { font-size: .85rem; color: var(--muted); }
+.tri-fuel__list em { font-style: normal; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tri-dot--pre { background: var(--c-t); }
+@media (max-width: 700px) {
+  .tri-fuel__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tri-fuel__list li { grid-template-columns: 52px auto minmax(0, 1fr); }
+  .tri-fuel__list em { display: none; }
+}
+
+/* ----- Responsive ----- */
+@media (max-width: 1000px) {
+  .tri-formats { grid-template-columns: repeat(3, 1fr); }
+  .tri-leg { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tri-leg__name { grid-column: 1 / -1; }
+  .tri-leg__spacer { display: none; }
+  .tri-legs__head { display: none; }
+  .tri-leg .field > label { display: block; }
+  .tri-result__top { grid-template-columns: 1fr; }
+  .tri-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .tri-formats { grid-template-columns: repeat(2, 1fr); }
+  /* Tableaux plus serrés pour tenir dans l'écran */
+  .tri-table th, .tri-table td { padding: 9px 8px; font-size: .8rem; }
+  .tri-table th { letter-spacing: .04em; font-size: .66rem; }
+  .tri-table td:first-child { white-space: normal; }
+  .tri-leg { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 70" width="248" height="140">
+  <!-- Le « oo » de LOOPACE : une boucle infinie en forme de parcours (départ épinglé, arrivée pointée) -->
+  <defs>
+    <linearGradient id="infGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fb0a72"/>
+      <stop offset=".5" stop-color="#e805b7"/>
+      <stop offset="1" stop-color="#8f01fb"/>
+    </linearGradient>
+  </defs>
+  <!-- Ruban -->
+  <path d="M62 36 C74 12 114 8 114 36 C114 64 74 60 62 36 C50 12 10 8 10 36 C10 64 50 60 62 36 Z"
+        fill="none" stroke="url(#infGrad)" stroke-width="15" stroke-linejoin="round"/>
+  <!-- Ligne pointillée au centre du ruban -->
+  <path d="M62 36 C74 12 114 8 114 36 C114 64 74 60 62 36 C50 12 10 8 10 36 C10 64 50 60 62 36 Z"
+        fill="none" stroke="#ffffff" stroke-width="1.9" stroke-dasharray="4.2 3.6" stroke-linecap="round"/>
+  <!-- Arrivée -->
+  <circle cx="100" cy="53" r="5.6" fill="#6c01d0" stroke="#ffffff" stroke-width="2"/>
+  <!-- Épingle de départ -->
+  <path d="M21 2.5 C15.8 2.5 12 6.3 12 11.2 C12 17 21 25 21 25 C21 25 30 17 30 11.2 C30 6.3 26.2 2.5 21 2.5 Z"
+        fill="#fc0c71" stroke="#ffffff" stroke-width="2"/>
+  <circle cx="21" cy="11" r="3.4" fill="#ffffff"/>
+</svg>

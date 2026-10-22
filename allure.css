@@ -1,0 +1,313 @@
+/* =========================================================
+   CALCULATEUR D'ALLURE (complète styles.css)
+   ========================================================= */
+
+.tool-hero {
+  position: relative;
+  padding: 140px 0 40px;
+  text-align: center;
+  isolation: isolate;
+  overflow: hidden;
+}
+.tool-hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse at 50% 0%, rgba(var(--accent-rgb), .22), transparent 60%);
+}
+.tool-hero h1 { font-size: clamp(2.4rem, 7vw, 4.2rem); letter-spacing: -0.02em; }
+.tool-hero p:last-child { max-width: 520px; margin: 0 auto; }
+
+.tool-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+  padding-bottom: 20px;
+}
+/* Même écart (20px) entre tous les blocs ; plus d'espace seulement sous le dernier */
+.tool-section { padding-bottom: 20px; }
+#routeSection { padding-bottom: 80px; }
+.tool-section[hidden] { display: none; }
+
+.card {
+  padding: clamp(20px, 3vw, 32px);
+  border-radius: 24px;
+  border: 1px solid var(--line);
+  background: var(--black-2);
+}
+.card h2 { font-size: 1.4rem; margin-bottom: .3em; }
+.card__hint { font-size: .88rem; margin: 0 0 16px; }
+
+/* ----- Boutons segmentés ----- */
+.seg { display: inline-flex; padding: 4px; gap: 4px; border-radius: 999px; border: 1px solid var(--line); background: var(--black); }
+.seg button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: .55em 1.1em; border-radius: 999px; border: 0;
+  background: none; color: var(--muted);
+  font: 600 .9rem var(--font-body); cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--grad); color: var(--on-accent); }
+.seg button svg { width: 18px; height: 18px; }
+.seg--sport { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; border-radius: 16px; }
+.seg--sport button { border-radius: 12px; padding: .8em; }
+.seg--small button { padding: .45em .9em; font-size: .85rem; }
+
+.calc { display: grid; gap: 22px; }
+.calc__target { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: .9rem; color: var(--muted); }
+
+/* ----- Champs ----- */
+.fields { display: grid; gap: 16px; }
+.field { display: grid; gap: 6px; }
+.field label { font-size: .85rem; font-weight: 600; }
+.field small { font-size: .75rem; color: var(--muted); }
+.field__input {
+  display: flex; align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--black);
+  transition: border-color .2s, background .2s;
+}
+.field__input:focus-within { border-color: var(--pink); }
+.field__input input,
+.field__input select {
+  flex: 1; min-width: 0;
+  padding: 14px 16px;
+  background: none; border: 0; outline: 0;
+  color: var(--text);
+  font: 700 1.3rem var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+.field__input select { font: 600 1rem var(--font-body); cursor: pointer; appearance: none; }
+.field__input--select { position: relative; }
+.field__input--select::after { content: "▾"; position: absolute; right: 16px; color: var(--pink); pointer-events: none; }
+.field__input select option { background: var(--black-2); }
+.field__input em { padding-right: 16px; font-style: normal; color: var(--muted); font-size: .9rem; white-space: nowrap; }
+
+/* Champ calculé : mis en avant, non modifiable */
+.field.is-output .field__input {
+  border-color: transparent;
+  background: rgba(var(--accent-rgb), .1);
+}
+.field.is-output input { color: var(--pink); cursor: default; }
+.field.is-output label::after { content: " · calculé"; color: var(--pink); font-weight: 500; }
+.field.is-output .chips,
+.field.is-output small { display: none; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips button {
+  padding: .35em .85em; border-radius: 999px;
+  border: 1px solid var(--line); background: none;
+  color: var(--muted); font: 500 .8rem var(--font-body);
+  cursor: pointer; transition: color .2s, border-color .2s;
+}
+.chips button:hover { color: var(--text); border-color: var(--pink); }
+
+/* ----- Résultat ----- */
+.result {
+  display: grid; gap: 6px; justify-items: center; text-align: center;
+  padding: 24px 16px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), .25), transparent 70%),
+    var(--black);
+  border: 1px solid rgba(var(--accent-rgb), .3);
+}
+.result__label { font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; color: var(--muted); }
+.result__main {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 7vw, 3.6rem);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.result__extra { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; font-size: .88rem; color: var(--muted); }
+.result__extra span { padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); }
+.result.is-empty .result__main { background: none; color: var(--muted); }
+
+/* ----- Temps de passage ----- */
+/* Le bloc prend la hauteur du calculateur ; le tableau défile à l'intérieur.
+   Le tableau est en position absolue : il n'agrandit donc pas la ligne, il remplit l'espace restant. */
+.splits { display: flex; flex-direction: column; }
+.splits__band { margin-top: 14px; width: 100%; gap: 8px; border: 0; cursor: pointer; font: 600 .95rem var(--font-body); }
+.splits__band svg { width: 18px; height: 18px; }
+.table-wrap { position: relative; flex: 1; min-height: 240px; overflow: auto; border-radius: 14px; border: 1px solid var(--line); }
+.table-wrap > table { position: absolute; top: 0; left: 0; }
+table { width: 100%; border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+th { position: sticky; top: 0; background: var(--black-3); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+td:nth-child(2) { font-weight: 600; }
+td:nth-child(3) { color: var(--muted); }
+tbody tr:hover { background: rgba(var(--accent-rgb), .06); }
+tr.is-finish td { color: var(--pink); font-weight: 700; border-bottom: 0; }
+
+/* ----- Prédiction ----- */
+.predict { display: grid; gap: 20px; }
+.predict__head { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+.predict__inputs { display: flex; gap: 12px; flex-wrap: wrap; }
+.predict__inputs .field { min-width: 180px; }
+.predict__inputs .field__input input { font-size: 1.1rem; padding: 12px 14px; }
+.predict__inputs .field__input select { padding: 13px 40px 13px 14px; }
+.predict__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.predict__item {
+  display: grid; gap: 4px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: var(--black);
+}
+.predict__item span { font-size: .8rem; color: var(--muted); }
+.predict__item strong { font-family: var(--font-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+.predict__item em { font-style: normal; font-size: .85rem; color: var(--pink); }
+.predict__item.is-ref { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .08); }
+.predict__note { margin: 0; font-size: .78rem; }
+
+@media (max-width: 900px) {
+  .tool-grid { grid-template-columns: 1fr; }
+  .table-wrap { flex: none; max-height: 420px; }
+  .table-wrap > table { position: static; }
+  .predict__grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .seg--small { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
+  .predict__inputs .field { flex: 1 1 100%; }
+}
+
+/* ----- Prédiction sur un parcours ----- */
+.route-predict { display: grid; gap: 20px; }
+.rp-empty { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 20px; border-radius: 16px; border: 1px dashed rgba(var(--accent-rgb), .4); }
+.rp-empty p { margin: 0; }
+.rp-empty[hidden], .rp-body[hidden], .rp-results[hidden], .rp-table[hidden], .rp-status[hidden] { display: none; }
+.rp-body { display: grid; gap: 20px; }
+.rp-inputs { display: grid; grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1fr); gap: 16px; align-items: start; }
+/* Colonnes de largeur fixe : rien ne déborde ni ne bouge quand on change d'objectif */
+.rp-inputs .field { min-width: 0; }
+.rp-inputs .field small { display: block; min-height: 2.6em; }
+.rp-inputs .field__input input { width: 100%; }
+.rp-inputs .field.is-readonly .field__input { border-color: transparent; background: rgba(var(--accent-rgb), .1); }
+.rp-inputs .field.is-readonly input { font-size: 1rem; color: var(--pink); cursor: default; }
+.rp-inputs .field__input select { padding: 13px 40px 13px 14px; }
+.rp-inputs .field__input input { font-size: 1.1rem; padding: 12px 14px; min-width: 0; }
+.field__label { font-size: .85rem; font-weight: 600; }
+.rp-inputs .seg { justify-self: start; }
+.rp-status { margin: 0; padding: 16px; border-radius: 14px; background: var(--black); text-align: center; }
+.rp-results { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 16px; }
+.rp-profile { display: grid; gap: 8px; padding: 16px; border-radius: 18px; border: 1px solid var(--line); background: var(--black); }
+.rp-profile__head { display: flex; justify-content: space-between; font-size: .85rem; }
+.rp-profile__head span:last-child { color: var(--pink); font-weight: 600; }
+.rp-profile svg { width: 100%; height: 140px; display: block; }
+.rp-table { max-height: 360px; min-height: 0; }
+.field[hidden] { display: none; }
+.rp-table > table { position: static; }
+td.grade.up { color: #ff9a8a; }
+td.grade.down { color: #7dd3c0; }
+
+@media (max-width: 900px) {
+  .rp-inputs,
+  .rp-results { grid-template-columns: 1fr; }
+}
+.rp-approx { margin: 0; padding: 12px 16px; border-radius: 14px; border: 1px solid rgba(250, 204, 21, .35); background: rgba(250, 204, 21, .08); font-size: .85rem; color: var(--text); }
+.rp-approx[hidden] { display: none; }
+.rp-approx a { color: var(--pink); text-decoration: underline; }
+
+/* ----- Bracelet d'allure ----- */
+.band-cta {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px solid rgba(var(--accent-rgb), .4);
+  background: radial-gradient(circle at 100% 50%, rgba(var(--accent-rgb), .18), transparent 60%), var(--black);
+}
+.band-cta div { display: grid; gap: 2px; }
+.band-cta span { font-size: .85rem; color: var(--muted); }
+.band-cta .btn { border: 0; cursor: pointer; gap: 8px; font: 600 .95rem var(--font-body); }
+.band-cta .btn svg { width: 18px; height: 18px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.icon-btn {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: rgba(11, 11, 12, .7);
+  color: var(--text);
+  cursor: pointer;
+}
+.icon-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+.band-modal {
+  width: min(980px, 100% - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: clamp(18px, 3vw, 28px);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--black-2);
+  color: var(--text);
+  overflow: auto;
+}
+.band-modal[open] { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.band-modal::backdrop { background: rgba(0, 0, 0, .75); backdrop-filter: blur(6px); }
+.band-modal__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.band-modal__head h2 { margin: 0; font-size: clamp(1.3rem, 3vw, 1.7rem); }
+.band-modal__head .eyebrow { margin-bottom: .3rem; }
+.band-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.band-option {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: start;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--black);
+}
+.band-option h3 { margin: 0 0 .4em; font-size: 1.15rem; }
+.band-option p { font-size: .88rem; }
+.band-option__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.band-option .btn { border: 0; cursor: pointer; font: 600 .9rem var(--font-body); padding: .7em 1.2em; }
+.band-option .btn--ghost { border: 1px solid var(--line); }
+.band-preview { display: grid; place-items: start center; max-height: 56dvh; overflow: auto; border-radius: 12px; }
+.band-preview--band { width: 120px; background: #e9e4e8; padding: 8px; }
+.band-preview--wall { width: 150px; }
+.band-canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
+
+@media (max-width: 760px) {
+  .band-grid { grid-template-columns: minmax(0, 1fr); }
+}
+/* Téléphone : aperçus plus petits pour que tout tienne dans la fenêtre */
+@media (max-width: 480px) {
+  .band-option { padding: 14px; gap: 14px; }
+  .band-preview--band { width: 96px; padding: 6px; }
+  .band-preview--wall { width: 104px; }
+  .band-option .btn { padding: .65em 1em; }
+}
+
+/* ----- « Passage tous les … » ----- */
+.split-step { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin-bottom: 14px; font-size: .85rem; }
+.split-step__label { font-weight: 600; }
+.chips__presets { display: contents; }
+/* Pastille « Autre » : même allure que les raccourcis, avec un petit champ dedans */
+.chip-custom {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: .35em .85em;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font: 500 .8rem var(--font-body);
+  cursor: text;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.chip-custom:hover,
+.chip-custom:focus-within { color: var(--text); border-color: var(--pink); border-style: solid; }
+.chip-custom input {
+  width: 3.4em; padding: 0;
+  background: none; border: 0; outline: 0;
+  color: inherit; font: inherit; text-align: right;
+}
+.chip-custom input::placeholder { color: var(--muted); text-align: left; }
+.chip-custom input:placeholder-shown { width: 3.2em; text-align: left; }
+.chip-custom input:placeholder-shown + em { display: none; }
+.chip-custom em { font-style: normal; }
+.chip-custom.is-active { background: var(--grad); color: var(--on-accent); border: 1px solid transparent; font-weight: 600; }
+.chip-custom.is-active input::placeholder { color: var(--on-accent); }
+.chips--step button[aria-pressed="true"] { background: var(--grad); color: var(--on-accent); border-color: transparent; font-weight: 600; }

@@ -1,0 +1,202 @@
+/* ===== DA Loopace : noir & rose ===== */
+:root {
+  --black: #0b0b0c;
+  --black-2: #121214;
+  --black-3: #1a1a1d;
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #f4eef3;
+  --muted: #a49ba3;
+  --pink: #d885cc;          /* rose du logo */
+  --lilac: #c98bef;         /* reflet violet du logo */
+  --grad: linear-gradient(135deg, var(--pink) 0%, var(--lilac) 100%);
+  --grad-text: var(--grad);          /* dégradé utilisé sur du texte */
+  --accent-rgb: 216, 133, 204;       /* = --pink, pour les transparences rgba() */
+  --accent2-rgb: 201, 139, 239;      /* = --lilac */
+  --on-accent: var(--black);         /* texte posé sur un fond d'accent */
+  --radius: 18px;
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.1; margin: 0 0 .5em; }
+h2 { font-size: clamp(2rem, 5vw, 3.4rem); letter-spacing: -0.02em; }
+h3 { font-size: 1.3rem; }
+p { margin: 0 0 1em; color: var(--muted); }
+
+::selection { background: var(--pink); color: var(--on-accent); }
+
+.container { width: min(1120px, 100% - 32px); margin-inline: auto; }
+
+.grad {
+  background: var(--grad-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--pink);
+  margin-bottom: 1rem;
+}
+
+/* ===== Boutons ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .9em 1.6em;
+  border-radius: 999px;
+  background: var(--grad);
+  color: var(--on-accent);
+  font-weight: 600;
+  transition: transform .25s, box-shadow .25s;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -8px rgba(var(--accent-rgb), .6);
+}
+.btn--ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.btn--ghost:hover { border-color: var(--pink); box-shadow: none; }
+.btn--small { padding: .55em 1.2em; font-size: .9rem; }
+.btn--big { font-size: clamp(1rem, 3vw, 1.4rem); padding: 1em 2em; }
+
+/* ===== Navigation : logo + les deux outils, toujours visibles ===== */
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px max(16px, calc((100% - 1120px) / 2));
+  background: rgba(11, 11, 12, .88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--line);
+}
+.nav__brand { display: flex; align-items: center; flex: none; }
+.nav__links { display: flex; align-items: center; gap: 8px; }
+.nav__link {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: .92rem; font-weight: 600;
+  white-space: nowrap;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.nav__link svg { width: 18px; height: 18px; flex: none; color: var(--pink); }
+.nav__link:hover { border-color: rgba(var(--accent-rgb), .6); background: rgba(var(--accent-rgb), .08); }
+.nav__link.is-active { background: var(--grad); border-color: transparent; color: var(--on-accent); }
+.nav__link.is-active svg { color: currentColor; }
+.nav__short { display: none; }
+
+/* ===== Sections ===== */
+.section { padding: clamp(80px, 12vw, 140px) 0; position: relative; }
+.section--alt { background: var(--black-2); border-block: 1px solid var(--line); }
+
+
+/* ===== Footer ===== */
+.footer {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 28px 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .85rem;
+}
+.footer img { width: 18px; height: auto; }
+.footer a { color: var(--pink); }
+
+/* ===== Animations ===== */
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .8s ease, transform .8s ease; }
+.reveal.is-visible { opacity: 1; transform: none; }
+
+@keyframes float { 50% { transform: translateY(-12px); } }
+@keyframes pulse { 50% { opacity: .6; scale: 1.08; } }
+@keyframes drift { to { transform: scale(1.08) translate(-1.5%, 1%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal { opacity: 1; transform: none; }
+}
+
+
+/* ===== Logo : L + la boucle infinie + PACE ===== */
+.logo {
+  display: inline-flex;
+  align-items: center;
+  font-family: "Exo 2", var(--font-display);
+  font-style: italic;
+  font-weight: 900;
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: .01em;
+  color: var(--text);
+}
+.logo .logo__inf,
+.nav__brand .logo .logo__inf { width: auto; height: 1.2em; margin: -.1em 0 -.1em .03em; }
+
+/* Petits écrans : libellés courts, mais toujours visibles */
+@media (max-width: 640px) {
+  .nav { gap: 10px; }
+  .nav .logo { font-size: 1.2rem; }
+  .nav__link { padding: 8px 12px; font-size: .85rem; gap: 6px; }
+  .nav__full { display: none; }
+  .nav__short { display: inline; }
+}
+/* Très petits écrans : icônes seules, sauf la page en cours qui garde son nom */
+@media (max-width: 480px) {
+  .nav .logo { font-size: 1.05rem; }
+  .nav__link { padding: 9px; }
+  .nav__link .nav__short { display: none; }
+  .nav__link.is-active { padding: 8px 12px; }
+  .nav__link.is-active .nav__short { display: inline; }
+}
+
+/* ----- Icônes : dégradé du logo, en blanc sur un fond en dégradé ----- */
+.ico { overflow: visible; }
+.nav__link.is-active .ico,
+.btn:not(.btn--ghost) .ico,
+.seg button[aria-pressed="true"] .ico { stroke: currentColor; }
+.nav__link.is-active .ico-dot,
+.btn:not(.btn--ghost) .ico-dot,
+.seg button[aria-pressed="true"] .ico-dot,
+.nav__link.is-active .ico--fill,
+.btn:not(.btn--ghost) .ico--fill,
+.seg button[aria-pressed="true"] .ico--fill { fill: currentColor; }
+
+/* ----- Menus déroulants : liste sombre et lisible (en-têtes de groupe compris) ----- */
+select { color-scheme: dark; }
+select option,
+select optgroup { background-color: #121214; color: #f4eef3; }
+select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }

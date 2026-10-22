@@ -1,0 +1,6 @@
+# Réglages locaux de Claude Code (pas utiles sur le site)
+.claude/
+# Fichiers système
+Thumbs.db
+Desktop.ini
+.DS_Store

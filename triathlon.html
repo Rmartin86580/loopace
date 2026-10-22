@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planificateur triathlon — Loopace</title>
+  <meta name="description" content="Planifie ton triathlon : natation, transitions, vélo et course. Temps de chaque discipline, temps total et heure d'arrivée, dénivelé de tes parcours compris. Gratuit.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo-loop.svg">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="allure.css?v=93">
+  <link rel="stylesheet" href="triathlon.css?v=93">
+  <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
+  <link rel="stylesheet" href="theme-logo.css?v=93">
+</head>
+<body class="page-tool">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lpGrad" gradientUnits="userSpaceOnUse" x1="2" y1="3" x2="22" y2="21"><stop offset="0" style="stop-color:var(--pink)"/><stop offset="1" style="stop-color:var(--lilac)"/></linearGradient></defs></svg>
+
+  <header class="nav" id="nav">
+    <a href="index.html" class="nav__brand" aria-label="Loopace — accueil">
+      <span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span>
+    </a>
+    <nav class="nav__links" aria-label="Outils">
+      <a href="parcours.html" title="Tracer un parcours" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 19H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5" stroke-dasharray="2.4 3.2"/><circle cx="5.5" cy="19" r="2"/><circle cx="18" cy="5" r="2.6" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Tracer un parcours</span><span class="nav__short">Parcours</span></a>
+      <a href="allure.html" title="Calculer mon allure" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="translate(1.5 0)"><circle cx="13" cy="13.5" r="7.5"/><path d="M13 10v3.5l2.5 1.5M11 2.5h4M13 2.5V6"/><path d="M1 11h2.5M0 15h2.5" opacity=".7"/></g></svg><span class="nav__full">Calculer mon allure</span><span class="nav__short">Allure</span></a>
+      <a href="seance.html" title="Séance → boucle" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h4v-5h4v5h3V7h4v11h5"/><circle cx="15" cy="3.5" r="1.4" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Séance → boucle</span><span class="nav__short">Séance</span></a>
+      <a href="triathlon.html" title="Planificateur triathlon" class="nav__link is-active" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2.2-2.8-3.8-4.5-6-4.5a4.5 4.5 0 0 0 0 9c2.2 0 3.8-1.7 6-4.5zm0 0c2.2 2.8 3.8 4.5 6 4.5a4.5 4.5 0 0 0 0-9c-2.2 0-3.8 1.7-6 4.5z"/></svg><span class="nav__full">Triathlon</span><span class="nav__short">Tri</span></a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="tool-hero">
+      <div class="container">
+        <p class="eyebrow">Outil</p>
+        <h1>Planificateur <span class="grad">triathlon</span></h1>
+        <p>Choisis ton format, renseigne tes allures ou tes temps : on calcule le reste, ton temps total et ton heure d'arrivée.</p>
+      </div>
+    </section>
+
+    <section class="container tri">
+      <!-- 1. Format -->
+      <div class="card tri-block">
+        <h2><span class="tri-step">1</span> Format</h2>
+        <div class="tri-formats" id="formats" role="group" aria-label="Format de la course"></div>
+        <p class="card__hint tri-format-note" id="formatNote" role="status" hidden></p>
+      </div>
+
+      <!-- 2. Les 5 étapes -->
+      <div class="card tri-block">
+        <h2><span class="tri-step">2</span> Tes allures ou tes temps</h2>
+        <div class="tri-goal">
+          <div class="tri-goal__text">
+            <strong>Tu vises un temps total ?</strong>
+            <span>On le répartit entre natation, vélo et course (transitions comprises).</span>
+          </div>
+          <div class="field">
+            <label for="goalTotal">Temps total visé</label>
+            <div class="field__input"><input id="goalTotal" type="text" inputmode="numeric" autocomplete="off" placeholder="2:45:00"></div>
+          </div>
+          <div class="field">
+            <label for="goalProfile">Ton profil</label>
+            <div class="field__input field__input--select">
+              <select id="goalProfile">
+                <option value="current">Mes allures actuelles</option>
+                <option value="even">Équilibré</option>
+                <option value="swim">Plutôt nageur</option>
+                <option value="bike">Plutôt cycliste</option>
+                <option value="run">Plutôt coureur</option>
+              </select>
+            </div>
+          </div>
+          <button type="button" class="btn" id="goalBtn">Répartir</button>
+          <p class="card__hint tri-goal__msg" id="goalMsg" role="status"></p>
+        </div>
+        <div class="tri-legs">
+          <div class="tri-legs__head" aria-hidden="true">
+            <span></span><span>Distance</span><span>Allure / vitesse</span><span>Temps</span><span>Parcours</span>
+          </div>
+
+          <div class="tri-leg" data-leg="swim">
+            <div class="tri-leg__name">
+              <span class="tri-leg__icon"><svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" aria-hidden="true"><circle cx="16.5" cy="5.5" r="2.5"/><path d="M8.67 12c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.12-.07.26-.15.41-.23L10.48 5C8.93 3.45 7.5 2.99 5 3v2.5c1.82-.01 2.89.39 4 1.5l1 1-3.25 3.25c.31.12.56.27.77.39.37.23.59.36 1.15.36z"/><path d="M22 16.5c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.45.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36s-.78.13-1.15.36c-.47.27-1.09.64-2.2.64v-2c.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36.56 0 .78-.13 1.15-.36.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.22.6.36 1.15.36v2zM22 21c-1.11 0-1.73-.37-2.18-.64-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.07.64-2.18.64s-1.73-.37-2.18-.64c-.37-.22-.6-.36-1.15-.36-.56 0-.78.13-1.15.36-.46.27-1.08.64-2.19.64-1.11 0-1.73-.37-2.18-.64-.37-.23-.6-.36-1.15-.36s-.78.13-1.15.36c-.46.27-1.08.64-2.19.64v-2c.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36.56 0 .78-.13 1.15-.36.46-.27 1.08-.64 2.19-.64 1.11 0 1.73.37 2.18.64.37.22.6.36 1.15.36s.78-.13 1.15-.36c.45-.27 1.07-.64 2.18-.64s1.73.37 2.18.64c.37.23.59.36 1.15.36v2z"/></svg></span>
+              <strong>Natation</strong>
+            </div>
+            <div class="field">
+              <label for="swimDist">Distance</label>
+              <div class="field__input"><input id="swimDist" type="text" inputmode="numeric" autocomplete="off"><em>m</em></div>
+            </div>
+            <div class="field">
+              <label for="swimPace">Allure</label>
+              <div class="field__input"><input id="swimPace" type="text" inputmode="numeric" autocomplete="off" placeholder="2:00"><em>/100 m</em></div>
+            </div>
+            <div class="field field--time">
+              <label for="swimTime">Temps</label>
+              <div class="field__input"><input id="swimTime" type="text" inputmode="numeric" autocomplete="off" placeholder="30:00"></div>
+            </div>
+            <div class="tri-leg__spacer"></div>
+          </div>
+
+          <div class="tri-leg tri-leg--transition" data-leg="t1">
+            <div class="tri-leg__name">
+              <span class="tri-leg__icon tri-leg__icon--t">T1</span>
+              <strong>Transition 1</strong>
+            </div>
+            <div class="tri-leg__spacer"></div>
+            <div class="tri-leg__spacer"></div>
+            <div class="field field--time">
+              <label for="t1Time">Temps</label>
+              <div class="field__input"><input id="t1Time" type="text" inputmode="numeric" autocomplete="off" placeholder="2:00"></div>
+            </div>
+            <div class="tri-leg__spacer"></div>
+          </div>
+
+          <div class="tri-leg" data-leg="bike">
+            <div class="tri-leg__name">
+              <span class="tri-leg__icon"><svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5zm5.8-10 2.4-2.4.8.8c1.3 1.3 3 2.1 5.1 2.1V9c-1.5 0-2.7-.6-3.6-1.5l-1.9-1.9c-.5-.4-1-.6-1.6-.6s-1.1.2-1.4.6L7.8 8.4c-.4.4-.6.9-.6 1.4 0 .6.2 1.1.6 1.4L11 14v5h2v-6.2l-2.2-2.3zM19 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z" stroke="none" transform="translate(3.6 2.8) scale(.85)"/><path d="M1 8.5h3M0 12h3" fill="none" opacity=".7"/></svg></span>
+              <strong>Vélo</strong>
+            </div>
+            <div class="field">
+              <label for="bikeDist">Distance</label>
+              <div class="field__input"><input id="bikeDist" type="text" inputmode="decimal" autocomplete="off"><em>km</em></div>
+            </div>
+            <div class="field">
+              <label for="bikeSpeed">Vitesse sur le plat</label>
+              <div class="field__input"><input id="bikeSpeed" type="text" inputmode="decimal" autocomplete="off" placeholder="30"><em>km/h</em></div>
+            </div>
+            <div class="field field--time">
+              <label for="bikeTime">Temps</label>
+              <div class="field__input"><input id="bikeTime" type="text" inputmode="numeric" autocomplete="off" placeholder="1:20:00"></div>
+            </div>
+            <div class="field">
+              <label for="bikeRoute">Parcours</label>
+              <div class="field__input field__input--select"><select id="bikeRoute"></select></div>
+              <small id="bikeRouteInfo"></small>
+            </div>
+          </div>
+
+          <div class="tri-leg tri-leg--transition" data-leg="t2">
+            <div class="tri-leg__name">
+              <span class="tri-leg__icon tri-leg__icon--t">T2</span>
+              <strong>Transition 2</strong>
+            </div>
+            <div class="tri-leg__spacer"></div>
+            <div class="tri-leg__spacer"></div>
+            <div class="field field--time">
+              <label for="t2Time">Temps</label>
+              <div class="field__input"><input id="t2Time" type="text" inputmode="numeric" autocomplete="off" placeholder="1:00"></div>
+            </div>
+            <div class="tri-leg__spacer"></div>
+          </div>
+
+          <div class="tri-leg" data-leg="run">
+            <div class="tri-leg__name">
+              <span class="tri-leg__icon"><svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9 1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" stroke="none" transform="translate(2.5 0)"/><path d="M1 9.5h3M0 13.5h3" fill="none" opacity=".7"/></svg></span>
+              <strong>Course à pied</strong>
+            </div>
+            <div class="field">
+              <label for="runDist">Distance</label>
+              <div class="field__input"><input id="runDist" type="text" inputmode="decimal" autocomplete="off"><em>km</em></div>
+            </div>
+            <div class="field">
+              <label for="runPace">Allure sur le plat</label>
+              <div class="field__input"><input id="runPace" type="text" inputmode="numeric" autocomplete="off" placeholder="5:00"><em>/km</em></div>
+            </div>
+            <div class="field field--time">
+              <label for="runTime">Temps</label>
+              <div class="field__input"><input id="runTime" type="text" inputmode="numeric" autocomplete="off" placeholder="50:00"></div>
+            </div>
+            <div class="field">
+              <label for="runRoute">Parcours</label>
+              <div class="field__input field__input--select"><select id="runRoute"></select></div>
+              <small id="runRouteInfo"></small>
+            </div>
+          </div>
+        </div>
+        <p class="card__hint tri-note">Remplis l'allure <strong>ou</strong> le temps : l'autre se calcule tout seul. Parcours : choisis un parcours créé dans l'outil <a href="parcours.html">Parcours</a> pour reprendre sa distance et tenir compte de son dénivelé.</p>
+      </div>
+
+      <!-- 3. Résultat -->
+      <div class="card tri-block tri-result">
+        <h2><span class="tri-step">3</span> Ta course</h2>
+        <div class="tri-result__top">
+          <div class="result tri-total">
+            <span class="result__label">Temps total</span>
+            <strong class="result__main" id="totalTime">—</strong>
+            <div class="result__extra" id="totalExtra"></div>
+          </div>
+          <div class="tri-clock">
+            <div class="field">
+              <label for="startTime">Heure de départ</label>
+              <div class="field__input"><input id="startTime" type="time" value="09:00"></div>
+            </div>
+            <div class="tri-clock__arrival">
+              <span>Arrivée prévue</span>
+              <strong id="arrival">—</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bilan par discipline -->
+        <div class="tri-sum" id="triSum"></div>
+        <!-- Frise : la part de chaque étape -->
+        <div class="tri-bar" id="triBar" aria-hidden="true"></div>
+
+        <div class="table-wrap tri-table">
+          <table>
+            <thead><tr><th>Étape</th><th>Temps</th><th>Passage</th><th>Heure</th></tr></thead>
+            <tbody id="triSplits"></tbody>
+          </table>
+        </div>
+        <div class="tri-actions">
+          <button class="btn" id="triBandBtn" disabled>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="3"/><path d="M10 7h4M10 11h4M10 15h4"/></svg>
+            Mon bracelet
+          </button>
+          <button class="btn btn--ghost" id="sheetBtn" disabled>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>
+            Fiche jour de course
+          </button>
+          <button class="btn btn--ghost" id="shareBtn" disabled>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>
+            Partager mon plan
+          </button>
+        </div>
+        <p class="card__hint tri-share-msg" id="shareMsg" role="status" hidden></p>
+      </div>
+
+      <!-- 4. Passages détaillés -->
+      <div class="card tri-block tri-detail">
+        <h2><span class="tri-step">4</span> Tes passages au km</h2>
+        <div class="tri-detail__bar">
+          <div class="seg" role="group" aria-label="Discipline" id="detailLeg">
+            <button type="button" data-leg="bike" aria-pressed="true"><svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM5 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5zm5.8-10 2.4-2.4.8.8c1.3 1.3 3 2.1 5.1 2.1V9c-1.5 0-2.7-.6-3.6-1.5l-1.9-1.9c-.5-.4-1-.6-1.6-.6s-1.1.2-1.4.6L7.8 8.4c-.4.4-.6.9-.6 1.4 0 .6.2 1.1.6 1.4L11 14v5h2v-6.2l-2.2-2.3zM19 12c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 8.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z" stroke="none" transform="translate(3.6 2.8) scale(.85)"/><path d="M1 8.5h3M0 12h3" fill="none" opacity=".7"/></svg>Vélo</button>
+            <button type="button" data-leg="run" aria-pressed="false"><svg class="ico ico--fill" viewBox="0 0 24 24" fill="url(#lpGrad)" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9 1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z" stroke="none" transform="translate(2.5 0)"/><path d="M1 9.5h3M0 13.5h3" fill="none" opacity=".7"/></svg>Course</button>
+          </div>
+          <div class="tri-detail__step">
+            <span>Passage tous les</span>
+            <div class="chips chips--step" id="detailStep" role="group" aria-label="Passage tous les"></div>
+          </div>
+        </div>
+        <p class="card__hint" id="detailHint"></p>
+        <div class="table-wrap tri-table">
+          <table>
+            <thead><tr><th>Km</th><th id="detailPaceHead">Vitesse</th><th id="detailLegHead">Temps vélo</th><th>Passage</th><th>Heure</th></tr></thead>
+            <tbody id="detailRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. Ravitaillement -->
+      <div class="card tri-block tri-fuel">
+        <h2><span class="tri-step">5</span> Ton ravitaillement</h2>
+        <div class="tri-detail__step">
+          <span>Météo prévue</span>
+          <div class="chips chips--step" id="fuelHeat" role="group" aria-label="Météo prévue">
+            <button type="button" data-heat="cool" aria-pressed="false">Fraîche</button>
+            <button type="button" data-heat="mild" aria-pressed="true">Normale</button>
+            <button type="button" data-heat="hot" aria-pressed="false">Chaude</button>
+          </div>
+        </div>
+        <div class="tri-fuel__stats" id="fuelStats"></div>
+        <ol class="tri-fuel__list" id="fuelList"></ol>
+        <p class="card__hint">Repères généraux pour un sportif amateur, à adapter à ton poids et à tes sensations. Teste toujours ta nutrition à l'entraînement : rien de nouveau le jour de la course.</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bracelet d'allure -->
+  <dialog class="band-modal" id="bandModal" aria-labelledby="bandTitle">
+    <div class="band-modal__head">
+      <div>
+        <p class="eyebrow">Bracelet d'allure</p>
+        <h2 id="bandTitle">Emporte ton plan de triathlon</h2>
+      </div>
+      <button class="icon-btn" id="bandClose" aria-label="Fermer">✕</button>
+    </div>
+    <div class="band-part">
+      <span>Quel bracelet ?</span>
+      <div class="seg seg--small" id="bandPart" role="group" aria-label="Quel bracelet">
+        <button type="button" data-part="all" aria-pressed="true">Toute la course</button>
+        <button type="button" data-part="bike" aria-pressed="false">Vélo · à coller sur le cadre</button>
+        <button type="button" data-part="run" aria-pressed="false">Course · au poignet</button>
+      </div>
+    </div>
+    <div class="band-grid">
+      <section class="band-option">
+        <div class="band-preview band-preview--band" id="bandPreview"></div>
+        <div class="band-option__text">
+          <h3>À imprimer</h3>
+          <p>Une bande de <span id="bandSize"></span> à découper et scotcher au poignet ou à l'avant-bras. Imprime à <strong>100 %</strong> (taille réelle).</p>
+          <div class="band-option__actions">
+            <button class="btn" id="bandPrint">Imprimer</button>
+            <button class="btn btn--ghost" id="bandDownload">Télécharger (PNG)</button>
+          </div>
+        </div>
+      </section>
+      <section class="band-option">
+        <div class="band-preview band-preview--wall" id="wallPreview"></div>
+        <div class="band-option__text">
+          <h3>Fond d'écran</h3>
+          <p>Mets-le en fond d'écran de verrouillage : tes passages en un coup d'œil pendant la course. ▲ montée, ▼ descente.</p>
+          <div class="band-option__actions">
+            <button class="btn" id="wallDownload">Télécharger (PNG)</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </dialog>
+
+  <footer class="footer">
+    <img src="assets/logo-loop.svg" alt="" width="22" height="22">
+    <span>© <span id="year"></span> Loopace · Une idée, un bug&nbsp;? <a href="mailto:contact@loopace.app">contact@loopace.app</a></span>
+  </footer>
+
+  <script src="script.js?v=93"></script>
+  <script src="triathlon.js?v=93"></script>
+  <script src="band.js?v=93"></script>
+</body>
+</html>
