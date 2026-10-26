@@ -200,3 +200,8 @@ select { color-scheme: dark; }
 select option,
 select optgroup { background-color: #121214; color: #f4eef3; }
 select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
+
+/* ----- Pastille « Bientôt » dans le menu (page en préparation) ----- */
+.nav__soon { margin-left: 2px; padding: .15em .5em; border-radius: 999px; background: rgba(var(--accent-rgb), .15); color: var(--pink); font: 700 .6rem var(--font-body); font-style: normal; letter-spacing: .06em; text-transform: uppercase; }
+.nav__link.is-active .nav__soon { background: rgba(255, 255, 255, .22); color: var(--on-accent); }
+@media (max-width: 480px) { .nav__soon { display: none; } }

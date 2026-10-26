@@ -224,3 +224,26 @@
   .tri-table td:first-child { white-space: normal; }
   .tri-leg { grid-template-columns: 1fr; }
 }
+
+/* ----- Page en préparation : écran « Bientôt » + mot de passe ----- */
+.tri-gate { display: none; }
+.tri-locked .tri-gate { display: grid; place-items: center; min-height: calc(100vh - 80px); padding: 120px 16px 60px; }
+.tri-locked main > :not(.tri-gate) { display: none !important; }
+.tri-locked .tri-gate__lockwrap { display: none; }
+.tri-gate__card {
+  width: min(520px, 100%); display: grid; gap: 16px; justify-items: center; text-align: center;
+  padding: clamp(24px, 5vw, 40px); border-radius: 24px; border: 1px solid var(--line); background: var(--black-2);
+}
+.tri-gate__card h1 { margin: 0; font-size: clamp(2rem, 6vw, 3rem); }
+.tri-gate__card > p { margin: 0; color: var(--muted); }
+.tri-gate__soon { padding: .35em .9em; border-radius: 999px; background: var(--grad); color: var(--on-accent); font: 700 .75rem var(--font-body); letter-spacing: .08em; text-transform: uppercase; }
+.tri-gate__form { width: 100%; display: grid; gap: 8px; text-align: left; margin-top: 6px; }
+.tri-gate__form label { font-size: .8rem; font-weight: 600; color: var(--muted); }
+.tri-gate__row { display: flex; gap: 8px; }
+.tri-gate__row input { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--black); color: var(--text); font: 500 1rem var(--font-body); }
+.tri-gate__row input:focus { outline: none; border-color: var(--pink); }
+.tri-gate__row .btn { border: 0; cursor: pointer; font: 600 .95rem var(--font-body); }
+.tri-gate__error { margin: 0; color: #ff8a8a; font-size: .85rem; }
+.tri-gate__back { font-size: .85rem; color: var(--muted); }
+.tri-gate__back:hover { color: var(--pink); }
+.tri-gate__lock { background: none; border: 0; padding: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }

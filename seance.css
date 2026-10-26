@@ -51,6 +51,7 @@
 }
 .se-step--warm { border-left-color: var(--se-warm); }
 .se-step--hard { border-left-color: var(--pink); }
+.se-step--open { border-left-style: dashed; border-left-color: var(--muted); opacity: .85; } /* bouton Lap : non comptée */
 .se-step strong { font-size: .95rem; }
 .se-step span { font-size: .85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 .se-step em { font-size: .8rem; font-style: normal; color: var(--muted); opacity: .8; }
@@ -59,6 +60,11 @@
 .se-repeat__head b { font-family: var(--font-display); font-size: 1.2rem; color: var(--pink); }
 .se-repeat__head span { font-size: .85rem; color: var(--muted); }
 
+.se-fit { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.se-fit span { font-size: .82rem; color: var(--muted); }
+.se-fit__btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.se-fit__btn svg { width: 18px; height: 18px; }
+.se-text.is-drop { border-color: var(--pink); border-style: dashed; background: rgba(var(--accent-rgb), .06); }
 .se-app { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
 .se-app .field label { font-size: .78rem; color: var(--muted); font-weight: 600; }
 .se-app .field__input--select select { font: 600 .95rem var(--font-body); padding: 11px 36px 11px 12px; width: 100%; }
@@ -71,6 +77,9 @@
 .se-vma .field__input em { padding-right: 12px; font-size: .8rem; }
 
 /* ----- 2. La boucle ----- */
+.se-sport { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.se-sport > span { font-size: .85rem; font-weight: 600; color: var(--muted); }
+.se-sport .seg { flex-wrap: wrap; border-radius: 16px; max-width: 100%; }
 .se-start { display: flex; gap: 10px; }
 .se-search { flex: 1; display: flex; border: 1px solid var(--line); border-radius: 14px; background: var(--black); overflow: hidden; }
 .se-search:focus-within { border-color: var(--pink); }

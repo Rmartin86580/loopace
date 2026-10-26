@@ -239,27 +239,6 @@ $("stepChips").addEventListener("click", (e) => {
   compute();
 });
 
-/* ---------- Prédiction de chronos (formule de Riegel) ---------- */
-const PREDICT = [["5 km", 5000], ["10 km", 10000], ["Semi", 21097.5], ["Marathon", 42195]];
-function renderPredict() {
-  const refD = Number($("refDist").value);
-  const refT = parseTime($("refTime").value);
-  if (!(refT > 0)) {
-    $("predictGrid").innerHTML = `<p class="card__hint">Entre ton temps (ex : 50:00).</p>`;
-    return;
-  }
-  $("predictGrid").innerHTML = PREDICT.map(([name, d]) => {
-    const t = refT * Math.pow(d / refD, 1.06);
-    const isRef = Math.abs(d - refD) < 1;
-    return `<div class="predict__item${isRef ? " is-ref" : ""}">
-      <span>${name}${isRef ? " · ta course" : ""}</span>
-      <strong>${fmtTime(t)}</strong>
-      <em>${fmtPace(t / (d / 1000))} /km</em>
-    </div>`;
-  }).join("");
-  saveState();
-}
-
 /* ---------- Interface ---------- */
 function renderPresets() {
   const sp = sport();
@@ -275,7 +254,6 @@ function applySport(keepValues) {
   $("paceHint").textContent = sp.paceHint;
   $("pace").inputMode = sp.speed ? "decimal" : "numeric";
   $("targetPaceBtn").textContent = sp.speed ? "ma vitesse" : "mon allure";
-  $("predictSection").hidden = state.sport !== "run";
   $("routeSection").hidden = state.sport === "swim"; // course et vélo : prédiction sur un parcours
   renderPresets();
   if (!keepValues) {
@@ -319,8 +297,6 @@ $("presets").addEventListener("click", (e) => {
   compute();
 });
 ["dist", "time", "pace"].forEach((id) => $(id).addEventListener("input", compute));
-$("refDist").addEventListener("change", renderPredict);
-$("refTime").addEventListener("input", renderPredict);
 
 /* ---------- Mémorise les dernières valeurs (dans ce navigateur) ---------- */
 const STORE_KEY = "rotiby-allure";
@@ -328,7 +304,7 @@ function saveState() {
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify({
       ...state, dist: $("dist").value, time: $("time").value, pace: $("pace").value,
-      refDist: $("refDist").value, refTime: $("refTime").value, step: state.step,
+      step: state.step,
     }));
   } catch { /* stockage indisponible */ }
 }
@@ -342,8 +318,6 @@ function loadState() {
     $("dist").value = saved.dist ?? $("dist").value;
     $("time").value = saved.time ?? $("time").value;
     $("pace").value = saved.pace ?? $("pace").value;
-    if (saved.refDist) $("refDist").value = saved.refDist;
-    if (saved.refTime) $("refTime").value = saved.refTime;
     if (saved.step && typeof saved.step === "object") state.step = saved.step;
   } else {
     applySport(false);
@@ -353,7 +327,6 @@ function loadState() {
 loadState();
 applyTarget();
 compute();
-renderPredict();
 
 /* =========================================================
    Prédiction sur un parcours enregistré (avec dénivelé)
@@ -439,11 +412,7 @@ function flatPace(profile) {
     const p = parsePace($("rpGoal").value);
     return p > 0 ? (p / 1000) * total / effort : NaN;
   }
-  // Estimation : course de référence ramenée à la distance du parcours (Riegel), puis dénivelé
-  const refD = Number($("refDist").value);
-  const refT = parseTime($("refTime").value);
-  if (!(refT > 0)) return NaN;
-  return (refT * Math.pow(total / refD, 1.06)) / total;
+  return NaN;
 }
 
 // Lisse l'altitude (moyenne sur ±100 m) : les données d'altitude ont un petit « bruit »
@@ -634,7 +603,7 @@ async function renderRoutePredict() {
   const spm = flatPace(profile);
   if (!(spm > 0)) {
     $("rpTime").textContent = "—";
-    $("rpExtra").innerHTML = `<span>${rp.goal === "ref" ? "Renseigne ta course de référence plus haut" : "Indique ton objectif"}</span>`;
+    $("rpExtra").innerHTML = "<span>Indique ton objectif</span>";
     $("rpSplits").innerHTML = "";
     $("bandBtn").disabled = true;
     return;
@@ -735,14 +704,8 @@ function renderBikePredict(route, rawProfile) {
   }).join("");
 }
 
-// Champ objectif : temps visé, allure (ou vitesse) visée, ou estimation (pas de champ)
+// Champ objectif : temps visé, ou allure (vitesse à vélo) visée
 function renderGoalField() {
-  // Vélo : pas d'« estimer » (basé sur une course à pied de référence)
-  if (isBike() && rp.goal === "ref") {
-    rp.goal = "time";
-    $("rpGoal").value = rp.goals.btime;
-  }
-  $("rpGoalRefBtn").hidden = isBike();
   $("rpGoalPaceBtn").textContent = isBike() ? "une vitesse" : "une allure";
   $("rpPaceHead").textContent = isBike() ? "Vitesse à tenir" : "Allure à tenir";
   $("rpNote").textContent = isBike()
@@ -750,10 +713,7 @@ function renderGoalField() {
     : "L'effort est réparti selon la pente : environ +3,3 % de temps par % de pente en montée ; en descente on gagne jusqu'à −10 %, au-delà le gain diminue (descente trop raide). Une estimation, pas une promesse !";
   const g = rp.goal;
   document.querySelectorAll("[data-goal]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.goal === g)));
-  // Le champ reste toujours affiché (la mise en page ne bouge pas) ; en « estimer » il est en lecture seule
-  $("rpGoalField").classList.toggle("is-readonly", g === "ref");
-  $("rpGoal").readOnly = g === "ref";
-  $("rpResultLabel").textContent = g === "ref" ? "Temps estimé" : "Temps visé";
+  $("rpResultLabel").textContent = "Temps visé";
   if (g === "time") {
     $("rpGoalLabel").textContent = "Temps visé";
     $("rpGoalUnit").textContent = "";
@@ -764,25 +724,18 @@ function renderGoalField() {
     $("rpGoalUnit").textContent = "km/h";
     $("rpGoal").placeholder = "28";
     $("rpGoalHint").textContent = "Ta vitesse moyenne sur l'ensemble du parcours.";
-  } else if (g === "pace") {
+  } else {
     $("rpGoalLabel").textContent = "Allure moyenne visée";
     $("rpGoalUnit").textContent = "/km";
     $("rpGoal").placeholder = "mm:ss";
     $("rpGoalHint").textContent = "Ton allure moyenne sur l'ensemble du parcours.";
-  } else {
-    const refT = parseTime($("refTime").value);
-    $("rpGoalLabel").textContent = "Ma course de référence";
-    $("rpGoalUnit").textContent = "";
-    $("rpGoal").placeholder = "";
-    $("rpGoal").value = refT > 0 ? `${$("refDist").selectedOptions[0].textContent} en ${fmtTime(refT)}` : "à renseigner plus haut";
-    $("rpGoalHint").textContent = "Ton temps estimé d'après cette course (modifiable plus haut).";
   }
 }
 
 document.querySelectorAll("[data-goal]").forEach((b) => b.addEventListener("click", () => {
-  if (rp.goal !== "ref") rp.goals[goalKey()] = $("rpGoal").value; // garde la saisie de chaque mode
+  rp.goals[goalKey()] = $("rpGoal").value; // garde la saisie de chaque mode
   rp.goal = b.dataset.goal;
-  if (rp.goal !== "ref") $("rpGoal").value = rp.goals[goalKey()];
+  $("rpGoal").value = rp.goals[goalKey()];
   renderRoutePredict();
 }));
 $("rpRoute").addEventListener("change", renderRoutePredict);
@@ -791,8 +744,6 @@ $("rpGoal").addEventListener("input", () => {
   rp.touched[goalKey()] = true;
   renderRoutePredict();
 });
-$("refDist").addEventListener("change", renderRoutePredict);
-$("refTime").addEventListener("input", renderRoutePredict);
 // Un parcours enregistré dans un autre onglet apparaît tout de suite
 window.addEventListener("storage", (e) => {
   if (e.key === ROUTES_KEY) renderRoutePredict();

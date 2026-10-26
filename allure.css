@@ -144,36 +144,17 @@ td:nth-child(3) { color: var(--muted); }
 tbody tr:hover { background: rgba(var(--accent-rgb), .06); }
 tr.is-finish td { color: var(--pink); font-weight: 700; border-bottom: 0; }
 
-/* ----- Prédiction ----- */
-.predict { display: grid; gap: 20px; }
-.predict__head { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
-.predict__inputs { display: flex; gap: 12px; flex-wrap: wrap; }
-.predict__inputs .field { min-width: 180px; }
-.predict__inputs .field__input input { font-size: 1.1rem; padding: 12px 14px; }
-.predict__inputs .field__input select { padding: 13px 40px 13px 14px; }
-.predict__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.predict__item {
-  display: grid; gap: 4px;
-  padding: 18px;
-  border-radius: 16px;
-  border: 1px solid var(--line);
-  background: var(--black);
-}
-.predict__item span { font-size: .8rem; color: var(--muted); }
-.predict__item strong { font-family: var(--font-display); font-size: 1.6rem; font-variant-numeric: tabular-nums; }
-.predict__item em { font-style: normal; font-size: .85rem; color: var(--pink); }
-.predict__item.is-ref { border-color: rgba(var(--accent-rgb), .5); background: rgba(var(--accent-rgb), .08); }
+/* ----- Note sous la prédiction sur parcours ----- */
 .predict__note { margin: 0; font-size: .78rem; }
 
 @media (max-width: 900px) {
   .tool-grid { grid-template-columns: 1fr; }
   .table-wrap { flex: none; max-height: 420px; }
   .table-wrap > table { position: static; }
-  .predict__grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 480px) {
   .seg--small { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
-  .predict__inputs .field { flex: 1 1 100%; }
+  .rp-inputs .seg--small { grid-template-columns: repeat(2, 1fr); } /* « un temps » / « une allure » */
 }
 
 /* ----- Prédiction sur un parcours ----- */

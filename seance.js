@@ -5,10 +5,24 @@
       la durée et la distance de la séance.
    2. On choisit un point de départ : on crée une boucle de cette longueur
       qui revient au départ, colorée selon les étapes de la séance.
-   Services gratuits : OSRM (routing.openstreetmap.de), Photon, Open-Meteo.
+   Services gratuits : BRouter (itinéraires sans grandes routes), OSRM en secours, Photon, Open-Meteo.
    ========================================================= */
 const $ = (id) => document.getElementById(id);
+// Itinéraire des boucles : BRouter (profil randonnée, qui évite les grandes routes) ;
+// OSRM à pied en secours si BRouter ne répond pas.
+const BROUTER = "https://brouter.de/brouter";
 const ROUTER = "https://routing.openstreetmap.de/routed-foot/route/v1/driving/";
+// Chaque sport passe par ses propres chemins (profils BRouter)
+const SPORTS = {
+  run: { name: "Course à pied", brouter: "hiking-mountain", osrm: "routed-foot", saveAs: "run", gpx: "running" },
+  road: { name: "Vélo de route", brouter: "fastbike-lowtraffic", osrm: "routed-bike", saveAs: "bike", gpx: "cycling" },
+  mtb: { name: "VTT", brouter: "mtb", osrm: "routed-bike", saveAs: "bike", gpx: "cycling" },
+  gravel: { name: "Gravel", brouter: "gravel", osrm: "routed-bike", saveAs: "bike", gpx: "cycling" },
+};
+let sport = "run";
+const isBike = () => sport !== "run";
+// Routes à éviter pour courir : autoroutes, voies rapides, nationales et routes principales
+const BIG_ROADS = /^(motorway|trunk|primary)(_link)?$/;
 const SEARCH_URL = "https://photon.komoot.io/api/";
 const ELEVATION_URL = "https://api.open-meteo.com/v1/elevation";
 const ROUTES_KEY = "rotiby-parcours"; // parcours de l'outil Parcours
@@ -40,6 +54,7 @@ function fmtDuration(sec) {
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
   if (h) return `${h} h ${pad(m)}`;
+  if (!m) return `${s} s`;
   return s ? `${m} min ${pad(s)}` : `${m} min`;
 }
 
@@ -55,7 +70,9 @@ function fmtDuration(sec) {
    Les zones et pourcentages (VMA, seuil, Z2, % VMA…) sont convertis en allure avec ta VMA.
    ========================================================= */
 const MILE = 1609.34;
+// Champ « Ta VMA » masqué pour l'instant (voir seance.html) : 15 km/h par défaut
 const vma = () => {
+  if (!$("vma")) return 15;
   const v = Number(String($("vma").value).replace(",", "."));
   return v >= 6 && v <= 30 ? v : 15;
 };
@@ -179,7 +196,19 @@ function parseStep(text, fallbackName = "") {
     after = after.replace(en[0], " ");
   }
   const [beforeAt, atPart = ""] = after.split("@");
-  if (!effort.pace) Object.assign(effort, parseTarget(atPart) || parseTarget(beforeAt) || {});
+  if (!effort.pace) {
+    // Cible écrite après « @ » (ou zone / % juste après la durée) : on la garde telle quelle pour l'affichage
+    const src = parseTarget(atPart) ? atPart
+      : parseTarget(beforeAt) && /%|\bz\d|vma|seuil|threshold|tempo|\bas ?\d|semi|half|marathon|km\s*\/\s*h/i.test(beforeAt) ? beforeAt : "";
+    if (src) {
+      Object.assign(effort, parseTarget(src));
+      effort.targetText = src.replace(/\s+/g, " ").trim();
+    } else if (!atPart) {
+      Object.assign(effort, parseTarget(beforeAt) || {});
+    } else if (atPart.trim()) {
+      effort.targetText = atPart.replace(/\s+/g, " ").trim();
+    }
+  }
   // Nom : le texte autour de la durée, sans les allures et pourcentages
   const name = tidy(`${before} ${beforeAt}`
     .replace(/\d{1,2}\s*[:']\s*\d{2}(?:\s*[-–]\s*\d{1,2}\s*[:']\s*\d{2})?\s*(?:min)?\s*(?:\/\s*(?:km|mi))?/gi, " ")
@@ -302,6 +331,8 @@ const repeatCount = (t) => {
 
 // Noms qui commencent une étape même sans numéro
 const STEP_NAMES = /^(travail|warm ?up|warmup|cool ?down|cooldown|recovery|récup|recup|repos|rest|échauffement|echauffement|retour au calme|hard|easy|run|course|marche|walk|interval|fractionné|footing|active recovery|other|work|effort)\b/i;
+// Étape sans durée fixe : « jusqu'au bouton Lap » (Garmin : « Lap Button Press »), cardio, calories…
+const OPEN_RE = /bouton lap|touche lap|lap button|lap press|appui (?:sur )?(?:la touche |le bouton )?lap|until lap|jusqu'(?:au|à)|dur[ée]e libre|\bopen\b/i;
 // Étapes « hors répétition » quand le texte a perdu son retrait
 const TOP_LEVEL_NAMES = /^(warm ?up|warmup|cool ?down|cooldown|échauffement|echauffement|retour au calme)\b/i;
 
@@ -363,7 +394,7 @@ function parseWorkout(text) {
     const step = QTY_RE.test(line) || /^\d{3,5}\b/.test(line) ? parseStep(line) : null;
     if (step) {
       // Le nom était sur la ligne d'avant (Garmin, TrainingPeaks) : on complète l'étape
-      if (current && !current.effort) {
+      if (current && !current.effort && !current.open) {
         current.effort = step.effort;
         if (step.name && step.name !== current.name) current.notes.push(step.name);
         if (!current.effort.pace && !current.effort.pct && !current.effort.walk && !current.effort.static) Object.assign(current.effort, parseTarget(current.name) || {});
@@ -377,7 +408,7 @@ function parseWorkout(text) {
         top().node.children.push(current);
       }
     } else {
-      const startsStep = numbered || !current || (current.effort && (blankBefore || STEP_NAMES.test(line)));
+      const startsStep = numbered || !current || current.open || (current.effort && (blankBefore || STEP_NAMES.test(line)));
       if (startsStep) {
         const stayInside = stack.length > 1 && indent <= top().indent && !TOP_LEVEL_NAMES.test(line)
           && (top().node.children.length === 0 || (flat && !blankBefore));
@@ -390,6 +421,7 @@ function parseWorkout(text) {
         if (!current.effort.pace && !current.effort.pct && !current.effort.walk && !current.effort.static) Object.assign(current.effort, parseTarget(line) || {});
       } else {
         current.notes.push(line);
+        if (!current.effort && OPEN_RE.test(line)) current.open = true; // sans durée : non comptée
       }
     }
     blankBefore = false;
@@ -413,45 +445,61 @@ const WARM_WORDS = /warm|échauff|echauff/i;
 const EASY_WORDS = /recover|récup|recup|cool|retour|easy|footing|endurance|\bef\b|\brac\b|jog|trot|\brest\b|repos|marche|walk|\bz[12]\b/i;
 const HARD_WORDS = /travail|vma|seuil|tempo|hard|fast|rapide|sprint|c[ôo]te|threshold|interval|fractionn|race|allure sp|\bas ?\d|\bz[45]\b|effort|work/i;
 
-// Allure de chaque étape (s/km) : donnée, ou calculée depuis la VMA
+// Allure de chaque étape (s/km) : celle écrite dans la séance, rien d'autre.
+// Zones et % ne deviennent une allure que si l'utilisateur a donné sa VMA (champ « Ta VMA », masqué pour l'instant).
 function stepPace(e) {
   if (e.static) return null;
-  if (e.walk) return [600, 720];
   if (e.pace) return e.pace;
-  const pct = e.pct || [0.65, 0.72];
-  return [3600 / (vma() * pct[1]), 3600 / (vma() * pct[0])];
+  if (e.pct && $("vma")) return [3600 / (vma() * e.pct[1]), 3600 / (vma() * e.pct[0])];
+  return null;
 }
 
-// Durée, distance (fourchette), intensité et libellé de l'allure de chaque étape
+// Durée et distance de chaque étape : seulement ce que la séance permet de savoir.
+// Étape sans allure : on garde sa durée OU sa distance, l'autre reste inconnue (null).
 function measure(steps) {
-  const mids = steps.filter((s) => !s.effort.walk && !s.effort.static).map((s) => stepPace(s.effort)).map((p) => (p[0] + p[1]) / 2);
-  const fastest = mids.length ? Math.min(...mids) : 300;
-  const slowest = mids.length ? Math.max(...mids) : 360;
+  const mids = steps.map((s) => stepPace(s.effort)).filter(Boolean).map((p) => (p[0] + p[1]) / 2);
+  const fastest = mids.length ? Math.min(...mids) : 0;
+  const slowest = mids.length ? Math.max(...mids) : 0;
   return steps.map((s) => {
     const e = s.effort;
     const pace = stepPace(e);
     const mid = pace ? (pace[0] + pace[1]) / 2 : null;
-    const sec = e.sec ?? (pace ? (e.dist * mid) / 1000 : 0);
-    const dist = e.dist ?? (pace ? (sec / mid) * 1000 : 0);
-    const distMin = e.dist ?? (pace ? (sec / pace[1]) * 1000 : 0);
-    const distMax = e.dist ?? (pace ? (sec / pace[0]) * 1000 : 0);
-    const label = `${s.name} ${s.zone}`;
-    const ratio = mid ? 3600 / mid / vma() : 0;
-    const kind = !mid || e.walk ? "easy"
+    const sec = e.sec ?? (pace ? (e.dist * mid) / 1000 : null);
+    const dist = e.static ? 0 : e.dist ?? (pace ? (sec / mid) * 1000 : null);
+    const distMin = e.static ? 0 : e.dist ?? (pace ? (sec / pace[1]) * 1000 : null);
+    const distMax = e.static ? 0 : e.dist ?? (pace ? (sec / pace[0]) * 1000 : null);
+    // Couleur (effort / facile / échauffement) : d'après les mots, la zone ou l'allure de la séance
+    const label = `${s.name} ${s.zone} ${e.targetText || ""}`;
+    const pct = e.pct ? (e.pct[0] + e.pct[1]) / 2 : 0;
+    const kind = e.walk || e.static ? "easy"
       : WARM_WORDS.test(label) ? "warm"
       : EASY_WORDS.test(label) && !HARD_WORDS.test(label) ? "easy"
-      : HARD_WORDS.test(label) || ratio >= 0.82 || (slowest - fastest > 20 && mid <= fastest + 0.35 * (slowest - fastest)) ? "hard"
+      : HARD_WORDS.test(label) || pct >= 0.82 || (mid && slowest - fastest > 20 && mid <= fastest + 0.35 * (slowest - fastest)) ? "hard"
       : "easy";
-    const range = pace && Math.round(pace[0]) !== Math.round(pace[1]) ? `${fmtPace(pace[0])}–${fmtPace(pace[1])} /km` : pace ? `${fmtPace(pace[0])} /km` : "";
+    const kmh = (p) => fmtNum(3600 / p, 1);
+    const range = !pace ? ""
+      : isBike() ? (kmh(pace[1]) !== kmh(pace[0]) ? `${kmh(pace[1])}–${kmh(pace[0])} km/h` : `${kmh(pace[0])} km/h`)
+      : Math.round(pace[0]) !== Math.round(pace[1]) ? `${fmtPace(pace[0])}–${fmtPace(pace[1])} /km` : `${fmtPace(pace[0])} /km`;
     const target = e.static ? "récup sur place"
-      : e.walk ? "marche"
       : e.pace ? range
-      : e.pct ? `${Math.round(e.pct[0] * 100)}${e.pct[1] !== e.pct[0] ? `–${Math.round(e.pct[1] * 100)}` : ""} % VMA → ${range}`
-      : `allure footing → ${range}`;
+      : pace ? `${e.targetText || "zone"} → ${range} (ta VMA)`
+      : e.targetText ? `${e.targetText} · ${isBike() ? "vitesse" : "allure"} non précisée`
+      : e.walk ? "marche · allure non précisée"
+      : `${isBike() ? "vitesse" : "allure"} non précisée`;
     const title = s.name || (kind === "hard" ? "Effort" : kind === "warm" ? "Échauffement" : "Facile");
-    return { ...s, title, sec, dist, distMin, distMax, mid, kind, target, guessed: !e.pace && !e.pct && !e.walk && !e.static, fromVma: Boolean(e.pct) };
+    return { ...s, title, sec, dist, distMin, distMax, mid, kind, target };
   });
 }
+
+// Pour la frise et les couleurs sur la carte seulement : une étape sans allure prend une place
+// proportionnelle à sa durée (ou sa distance), au rythme moyen des étapes connues. Aucun chiffre affiché.
+function withPlacement(steps) {
+  const both = steps.filter((s) => s.sec != null && s.dist != null && s.dist > 0);
+  const speed = both.length ? both.reduce((a, s) => a + s.dist, 0) / both.reduce((a, s) => a + s.sec, 0) : 1000 / 360;
+  return steps.map((s) => ({ ...s, vSec: s.sec ?? s.dist / speed, vDist: s.dist ?? s.sec * speed }));
+}
+
+const sumKnown = (list, k) => list.reduce((a, s) => a + (s[k] ?? 0), 0);
 
 /* ---------- Affichage de la séance ---------- */
 let workout = null; // { steps (déroulées), sec, dist, distMin, distMax }
@@ -470,21 +518,26 @@ function renderTree(items) {
   return items.map((it) => {
     if (it.repeat) {
       const inner = flatten(it.children).map((s) => measured.get(s.effort)).filter(Boolean);
-      const sec = inner.reduce((a, s) => a + s.sec, 0) * it.repeat;
-      const dist = inner.reduce((a, s) => a + s.dist, 0) * it.repeat;
+      const sec = sumKnown(inner, "sec") * it.repeat;
+      const dist = sumKnown(inner, "dist") * it.repeat;
+      const secTxt = inner.some((x) => x.sec == null) ? (sec ? `${fmtDuration(sec)} + ?` : "durée inconnue") : fmtDuration(sec);
+      const distTxt = inner.some((x) => x.dist == null) ? (dist ? `${fmtNum(dist / 1000, 1)} km + ?` : "distance inconnue") : `${fmtNum(dist / 1000, 1)} km`;
       return `<li class="se-repeat">
-        <div class="se-repeat__head"><b>${it.repeat} ×</b><span>${fmtDuration(sec)} · ≈ ${fmtNum(dist / 1000, 1)} km</span></div>
+        <div class="se-repeat__head"><b>${it.repeat} ×</b><span>${secTxt} · ${distTxt}</span></div>
         <ol>${renderTree(it.children)}</ol>
       </li>`;
     }
-    if (!it.effort) return "";
+    if (!it.effort) {
+      return it.open ? `<li class="se-step se-step--open"><strong>${esc(it.name)}</strong>
+        <span>${esc(it.notes.join(" · "))} · non comptée dans la durée et la distance</span></li>` : "";
+    }
     return `<li class="se-step se-step--${measured.get(it.effort)?.kind || "easy"}">${stepLine(it)}</li>`;
   }).join("");
 }
 
 function readWorkout() {
   const tree = parseWorkout($("workoutText").value);
-  const steps = measure(flatten(tree));
+  const steps = withPlacement(measure(flatten(tree)));
   measured = new Map(steps.map((s) => [s.effort, s]));
   if (!steps.length) {
     workout = null;
@@ -495,21 +548,34 @@ function readWorkout() {
     updateLoopButton();
     return;
   }
-  const sum = (k) => steps.reduce((a, s) => a + s[k], 0);
-  workout = { steps, sec: sum("sec"), dist: sum("dist"), distMin: sum("distMin"), distMax: sum("distMax") };
+  const noTime = steps.filter((x) => x.sec == null);
+  const noDist = steps.filter((x) => x.dist == null);
+  workout = {
+    steps,
+    sec: sumKnown(steps, "sec"),
+    dist: sumKnown(steps, "dist"),
+    distMin: sumKnown(steps, "distMin"),
+    distMax: sumKnown(steps, "distMax"),
+    exact: !noDist.length, // distance totale connue
+    vDist: sumKnown(steps, "vDist"),
+  };
   $("workoutSteps").innerHTML = renderTree(tree);
 
-  const notes = [];
-  if (steps.some((s) => s.fromVma)) notes.push(`Allures calculées avec ta VMA de ${fmtNum(vma(), 1)} km/h.`);
-  if (steps.some((s) => s.guessed)) notes.push("Étapes sans allure : comptées à ton allure de footing.");
+  const km = (m) => `${fmtNum(m / 1000, 1)} km`;
+  const timeTxt = noTime.length ? (workout.sec ? `${fmtDuration(workout.sec)} + ?` : "inconnue") : fmtDuration(workout.sec);
+  const distTxt = noDist.length ? (workout.dist ? `${km(workout.dist)} + ?` : "inconnue") : `${Math.round(workout.distMin) !== Math.round(workout.distMax) ? "≈ " : ""}${km(workout.dist)}`;
+  const distSub = noDist.length
+    ? `${fmtDuration(sumKnown(noDist, "sec"))} sans allure dans la séance : distance inconnue`
+    : Math.round(workout.distMin / 100) !== Math.round(workout.distMax / 100) ? `entre ${km(workout.distMin)} et ${km(workout.distMax)} selon l'allure de la séance` : "";
+  const timeSub = noTime.length ? `${km(sumKnown(noTime, "dist"))} sans allure dans la séance : durée inconnue` : "";
   $("workoutTotals").innerHTML = `
-    <div class="se-total"><span>Durée</span><strong>${fmtDuration(workout.sec)}</strong></div>
-    <div class="se-total"><span>Distance</span><strong>≈ ${fmtNum(workout.dist / 1000, 1)} km</strong>
-      <small>entre ${fmtNum(workout.distMin / 1000, 1)} et ${fmtNum(workout.distMax / 1000, 1)} km selon ton allure</small></div>
-    ${notes.length ? `<p class="card__hint">${notes.join(" ")}</p>` : ""}`;
+    <div class="se-total"><span>Durée</span><strong>${timeTxt}</strong>${timeSub ? `<small>${timeSub}</small>` : ""}</div>
+    <div class="se-total"><span>Distance</span><strong>${distTxt}</strong>${distSub ? `<small>${distSub}</small>` : ""}</div>
+    ${noDist.length ? `<p class="card__hint">Pour connaître la distance, ajoute l'allure de ces étapes dans la séance (ex. « 1:30 @ 6:00 min/km »), ou indique toi-même la longueur de la boucle.</p>` : ""}`;
   // Frise : largeur proportionnelle à la durée de chaque étape
-  $("workoutBar").innerHTML = steps.map((s) => `<i class="se-bar__seg se-bar__seg--${s.kind}" style="flex-grow:${s.sec}" title="${esc(s.title)} · ${fmtDuration(s.sec)}"></i>`).join("");
-  if (!loopKmTouched) $("loopKm").value = fmtNum(workout.dist / 1000, 1);
+  $("workoutBar").innerHTML = steps.map((x) => `<i class="se-bar__seg se-bar__seg--${x.kind}" style="flex-grow:${x.vSec}" title="${esc(x.title)} · ${x.sec != null ? fmtDuration(x.sec) : "durée inconnue"}"></i>`).join("");
+  // Longueur de la boucle : la distance de la séance, seulement si elle est connue
+  if (!loopKmTouched) $("loopKm").value = workout.exact && workout.dist > 0 ? fmtNum(workout.dist / 1000, 1) : "";
   updateLoopButton();
   // Le parcours déjà tracé reprend les couleurs de la nouvelle séance
   if (loop) drawLoop();
@@ -518,11 +584,11 @@ function readWorkout() {
 /* ---------- Ton appli : comment récupérer la séance + un exemple dans son format ---------- */
 const APPS = {
   garmin: {
-    how: "Sur <b>connect.garmin.com</b>, ouvre l'entraînement, sélectionne les étapes à la souris et copie-les. Depuis l'appli du téléphone, recopie-les : une étape par ligne, « Répéter X fois » au-dessus des étapes répétées.",
+    how: "Sur <b>connect.garmin.com</b>, ouvre l'entraînement, sélectionne les étapes à la souris et copie-les. Depuis l'appli du téléphone, recopie-les : une étape par ligne, « Répéter X fois » au-dessus des étapes répétées. Tu peux aussi exporter la séance en <b>fichier .fit</b> et l'importer avec le bouton.",
     example: EXAMPLE,
   },
   coros: {
-    how: "Dans <b>Training Hub</b> (site web Coros) ou l'appli, ouvre l'entraînement et copie ou recopie les étapes. « Training x6 » ou « Répéter 6 fois » marquent les répétitions.",
+    how: "Dans <b>Training Hub</b> (site web Coros) ou l'appli, ouvre l'entraînement et copie ou recopie les étapes. « Training x6 » ou « Répéter 6 fois » marquent les répétitions. Tu peux aussi exporter la séance en <b>fichier .fit</b> et l'importer avec le bouton.",
     example: `Warm Up
 10:00 @ 6:00-6:30 /km
 Training x6
@@ -562,7 +628,7 @@ Cool down 10 min`,
 Retour au calme : 10 min`,
   },
   trainingpeaks: {
-    how: "Ouvre la séance et copie sa <b>description</b> (Warm up… Repeat… Cool Down). Les % d'allure seuil (« Threshold Pace ») sont convertis avec ta VMA.",
+    how: "Ouvre la séance et copie sa <b>description</b> (Warm up… Repeat… Cool Down). Les % d'allure seuil (« Threshold Pace ») sont convertis avec ta VMA. Tu peux aussi exporter la séance en <b>fichier .fit</b> et l'importer avec le bouton.",
     example: `Warm up
 15 min @ 65-75% Threshold Pace
 Repeat 5 times
@@ -574,7 +640,7 @@ Cool Down
 10 min @ 65% Threshold Pace`,
   },
   intervals: {
-    how: "Dans l'<b>éditeur de séance</b>, copie tout le texte. Attention : ici « m » veut dire minutes et « mtr » mètres.",
+    how: "Dans l'<b>éditeur de séance</b>, copie tout le texte. Attention : ici « m » veut dire minutes et « mtr » mètres. Tu peux aussi exporter la séance en <b>fichier .fit</b> et l'importer avec le bouton.",
     example: `Warmup 15m Z2 Pace
 
 Main Set 6x
@@ -601,19 +667,171 @@ Cooldown 10m Z2 Pace`,
   },
 };
 
+// Bloc « Ton appli » masqué pour l'instant (voir seance.html) : le code reste prêt
 function showApp() {
+  if (!$("appSelect")) return;
   const app = APPS[$("appSelect").value] || APPS.garmin;
   $("appHow").innerHTML = app.how;
 }
-$("appSelect").addEventListener("change", () => {
+$("appSelect")?.addEventListener("change", () => {
   showApp();
   save();
 });
-$("appExampleBtn").addEventListener("click", () => {
+$("appExampleBtn")?.addEventListener("click", () => {
   $("workoutText").value = (APPS[$("appSelect").value] || APPS.garmin).example;
   loopKmTouched = false;
   readWorkout();
   save();
+});
+
+/* ---------- Import d'un fichier .fit de séance (lecteur : fit.js) ----------
+   Étapes (message 27) : 254 index, 0 nom, 1 type de durée, 2 durée, 3 type de cible,
+   4 cible (zone ou nombre de répétitions), 5-6 cible perso basse/haute, 7 intensité.
+   La séance est réécrite en texte dans la zone de saisie : on peut la relire et la modifier. */
+const FIT_INTENSITY = { 0: "Course", 1: "Repos", 2: "Échauffement", 3: "Retour au calme", 4: "Récupération", 5: "Effort", 6: "Course" };
+const FIT_SPORTS = { 0: "générique", 1: "course à pied", 2: "vélo", 5: "natation", 11: "marche", 17: "randonnée" };
+
+const fitTime = (sec) => (sec % 60 === 0 ? `${sec / 60} min` : `${Math.floor(sec / 60)}:${pad(Math.round(sec % 60))}`);
+
+// Durée de l'étape en texte, ou null si elle n'est pas fixe (bouton Lap, cardio, calories…)
+function fitDuration(s) {
+  const type = s[1];
+  const v = s[2];
+  if ((type === 0 || type === 28) && v > 0) return fitTime(Math.round(v / 1000)); // millisecondes
+  if (type === 1 && v > 0) {
+    const m = v / 100; // centimètres
+    return m >= 1000 ? `${String(Math.round(m / 10) / 100)} km` : `${Math.round(m)} m`;
+  }
+  return null;
+}
+
+// Cible de l'étape en texte (« 3:45-4:00 min/km », « Z2 », « 70-80% HR »), ou null
+function fitTarget(s, bike = false) {
+  const type = s[3];
+  const zone = s[4];
+  const lo = s[5] || 0;
+  const hi = s[6] || 0;
+  if (type === 0 || type === 12) { // vitesse, en mm/s
+    if (lo || hi) {
+      if (bike) {
+        const speeds = [lo, hi].filter(Boolean).map((v) => Math.round(v * 0.036) / 10); // km/h
+        return `${Math.min(...speeds)}-${Math.max(...speeds)} km/h`;
+      }
+      const paces = [lo, hi].filter(Boolean).map((v) => 1e6 / v); // s/km
+      return `${fmtPace(Math.min(...paces))}-${fmtPace(Math.max(...paces))} min/km`;
+    }
+    if (zone >= 1 && zone <= 5) return `Z${zone}`;
+  }
+  if (type === 1 || type === 13) { // fréquence cardiaque
+    if (!lo && !hi && zone >= 1 && zone <= 5) return `Z${zone} HR`;
+    if (lo && lo <= 100 && hi <= 100) return `${lo}-${hi}% HR`; // % de la FC max
+    // Au-dessus de 100 : battements par minute (+100). Sans ta FC max, pas d'allure à en tirer.
+  }
+  return null;
+}
+
+function fitToText(fit) {
+  const steps = (fit[27] || []).slice().sort((a, b) => (a[254] ?? 0) - (b[254] ?? 0));
+  if (!steps.length) {
+    throw new Error(fit[20] || fit[19] || fit[18]
+      ? "Ce fichier .fit est une sortie enregistrée, pas une séance à faire. Exporte la séance prévue (l'entraînement), pas l'activité."
+      : "Aucune étape de séance trouvée dans ce fichier .fit.");
+  }
+  const workout = (fit[26] || [])[0] || {};
+  const bike = workout[4] === 2;
+  const notes = [];
+  // Arbre : une étape « répéter » (durée de type 6) reprend les étapes depuis l'index indiqué
+  let nodes = [];
+  steps.forEach((s, i) => {
+    const idx = s[254] ?? i;
+    if ([6, 7, 8, 9, 10, 11, 12, 13, 17, 18].includes(s[1])) { // types « répéter… »
+      const from = s[2] ?? 0;
+      const children = nodes.filter((n) => n.idx >= from);
+      nodes = nodes.filter((n) => n.idx < from);
+      const count = s[1] === 6 ? s[4] || 1 : 1;
+      if (s[1] !== 6) notes.push("une répétition « jusqu'à un temps, une distance ou un cardio » est comptée une seule fois");
+      if (children.length) nodes.push({ idx: from, repeat: count, children });
+    } else {
+      nodes.push({ idx, step: s });
+    }
+  });
+  let free = 0;
+  let bpm = 0;
+  const lines = [];
+  (function write(list, depth) {
+    const ind = "  ".repeat(depth);
+    for (const n of list) {
+      if (n.repeat) {
+        lines.push(`${ind}Répéter ${n.repeat} fois`);
+        write(n.children, depth + 1);
+        continue;
+      }
+      const s = n.step;
+      const title = String(s[0] || FIT_INTENSITY[s[7]] || "Course").replace(/\d/g, "").replace(/\s+/g, " ").trim() || FIT_INTENSITY[s[7]] || "Course";
+      const dur = fitDuration(s);
+      const target = fitTarget(s, bike);
+      if (!dur) free++;
+      // Sans durée fixe : on garde l'étape telle quelle, sans lui inventer de durée
+      const open = s[1] === 2 || s[1] === 3 ? "jusqu'à la fréquence cardiaque visée"
+        : s[1] === 4 ? "jusqu'aux calories visées"
+        : s[1] === 5 ? "jusqu'au bouton Lap" : "durée libre";
+      if ((s[3] === 1 || s[3] === 13) && ((s[5] || 0) > 100 || (s[6] || 0) > 100)) bpm++;
+      // Une ligne vide avant chaque étape : son nom ne peut pas être pris pour la zone de l'étape d'avant
+      if (lines.length && lines[lines.length - 1] !== "") lines.push("");
+      lines.push(`${ind}${title}`);
+      lines.push(dur ? `${ind}${dur}${target ? ` @ ${target}` : ""}` : `${ind}${open}`);
+    }
+  })(nodes, 0);
+  if (free) notes.push(`${free} étape${free > 1 ? "s" : ""} sans durée fixe (bouton Lap…) : non comptée${free > 1 ? "s" : ""} dans la durée et la distance`);
+  if (bpm) notes.push("cibles cardio en battements/min : pas d'allure pour ces étapes");
+  return { text: lines.join("\n"), name: workout[8] || "", sport: workout[4], subSport: workout[11], steps: steps.length, notes };
+}
+
+function fitMsg(text, error = false) {
+  $("fitMsg").textContent = text;
+  $("fitMsg").hidden = !text;
+  $("fitMsg").classList.toggle("is-error", error);
+}
+
+async function importFit(file) {
+  if (!file) return;
+  if (!/\.fit$/i.test(file.name)) return fitMsg("Choisis un fichier .fit (séance exportée depuis ta montre ou ton appli).", true);
+  try {
+    const fit = readFit(await file.arrayBuffer());
+    const r = fitToText(fit);
+    if (r.sport === 5) return fitMsg("C'est une séance de natation : pas de boucle à tracer pour celle-ci.", true);
+    // Sport du fichier : vélo (VTT 8, gravel 46, sinon route), sinon à pied
+    if (r.sport === 2) setSport(r.subSport === 8 ? "mtb" : r.subSport === 46 ? "gravel" : "road");
+    else if ([1, 11, 17].includes(r.sport)) setSport("run");
+    $("workoutText").value = r.text;
+    loopKmTouched = false;
+    readWorkout();
+    save();
+    const other = r.sport != null && ![0, 1, 2, 11, 17].includes(r.sport) ? ` Séance de ${FIT_SPORTS[r.sport] || "un autre sport"} : vérifie le sport choisi pour la boucle.` : "";
+    fitMsg(`${r.name ? `« ${r.name} »` : "Séance"} importée depuis ${file.name} (${SPORTS[sport].name}).${r.notes.length ? ` À savoir : ${r.notes.join(" ; ")}.` : ""}${other}`);
+  } catch (e) {
+    fitMsg(e.message && !/offset|bounds|range/i.test(e.message) ? e.message : "Impossible de lire ce fichier .fit.", true);
+  }
+}
+
+$("fitInput").addEventListener("change", (e) => {
+  importFit(e.target.files[0]);
+  e.target.value = ""; // permet de réimporter le même fichier
+});
+// Glisser-déposer un .fit sur la zone de texte
+$("workoutText").addEventListener("dragover", (e) => {
+  if ([...e.dataTransfer.items].some((i) => i.kind === "file")) {
+    e.preventDefault();
+    $("workoutText").classList.add("is-drop");
+  }
+});
+$("workoutText").addEventListener("dragleave", () => $("workoutText").classList.remove("is-drop"));
+$("workoutText").addEventListener("drop", (e) => {
+  const file = e.dataTransfer.files[0];
+  $("workoutText").classList.remove("is-drop");
+  if (!file) return;
+  e.preventDefault();
+  importFit(file);
 });
 
 let loopKmTouched = false;
@@ -621,7 +839,7 @@ $("workoutText").addEventListener("input", () => {
   readWorkout();
   save();
 });
-$("vma").addEventListener("input", () => {
+$("vma")?.addEventListener("input", () => {
   readWorkout();
   save();
 });
@@ -646,6 +864,7 @@ const baseLayers = {
 };
 baseLayers.Sombre.addTo(map);
 L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
+map.attributionControl.addAttribution('Itinéraires <a href="https://brouter.de/">BRouter</a>');
 
 const loopLayer = L.layerGroup().addTo(map);
 let start = null; // { lat, lng }
@@ -796,15 +1015,66 @@ function reusedShare(line) {
 }
 
 async function routeThrough(points) {
+  try {
+    return await routeBrouter(points);
+  } catch {
+    return await routeOsrm(points); // secours : sans contrôle du type de route
+  }
+}
+
+// BRouter donne, pour chaque tronçon, ses tags OpenStreetMap : on mesure la part sur une grande route
+async function routeBrouter(points) {
+  const lonlats = points.map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`).join("|");
+  const res = await fetch(`${BROUTER}?lonlats=${lonlats}&profile=${SPORTS[sport].brouter}&alternativeidx=0&format=geojson`, { signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`BRouter ${res.status}`);
+  const f = (await res.json()).features[0];
+  const msgs = f.properties.messages || [];
+  const head = msgs[0] || [];
+  const iTags = head.indexOf("WayTags");
+  const iDist = head.indexOf("Distance");
+  let big = 0;
+  let total = 0;
+  const refs = new Set();
+  for (const m of msgs.slice(1)) {
+    const d = Number(m[iDist]) || 0;
+    const tags = String(m[iTags] || "");
+    total += d;
+    if (BIG_ROADS.test((tags.match(/\bhighway=(\w+)/) || [])[1] || "")) {
+      big += d;
+      const ref = (tags.match(/\bref=(\S+)/) || [])[1];
+      if (ref) refs.add(ref.replace(/_/g, " "));
+    }
+  }
+  const line = removeSpurs(f.geometry.coordinates.map(([lng, lat]) => [lat, lng]));
+  const cum = cumDist(line);
+  return { line, distance: cum[cum.length - 1], reused: reusedShare(line), bigRoad: total ? big / total : 0, bigMeters: Math.round(big), bigRefs: [...refs] };
+}
+
+async function routeOsrm(points) {
   const coords = points.map((p) => `${p.lng.toFixed(6)},${p.lat.toFixed(6)}`).join(";");
   // continue_straight : pas de demi-tour pour « toucher » un point de passage
-  const res = await fetch(`${ROUTER}${coords}?overview=full&geometries=geojson&continue_straight=true`, { signal: AbortSignal.timeout(12000) });
+  const res = await fetch(`${ROUTER.replace("routed-foot", SPORTS[sport].osrm)}${coords}?overview=full&geometries=geojson&continue_straight=true`, { signal: AbortSignal.timeout(12000) });
   const json = await res.json();
   if (json.code !== "Ok") throw new Error(json.code);
   const line = removeSpurs(json.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]));
   const cum = cumDist(line);
-  return { line, distance: cum[cum.length - 1], reused: reusedShare(line) };
+  return { line, distance: cum[cum.length - 1], reused: reusedShare(line), bigRoad: null };
 }
+
+function setSport(next) {
+  if (!SPORTS[next]) return;
+  const changed = next !== sport;
+  sport = next;
+  document.querySelectorAll("#sportSeg [data-sport]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sport === sport)));
+  if (changed && workout) readWorkout(); // vitesses en km/h ou allures en min/km
+  if (changed && loop) status(`Sport changé (${SPORTS[sport].name}) : clique sur « Une autre boucle » pour une boucle adaptée.`);
+}
+$("sportSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-sport]");
+  if (!b) return;
+  setSport(b.dataset.sport);
+  save();
+});
 
 let busy = false;
 async function makeLoop() {
@@ -814,17 +1084,18 @@ async function makeLoop() {
   busy = true;
   $("loopBtn").disabled = true;
   status("Recherche d'une boucle…");
-  // Note d'une boucle : écart à la distance visée + pénalité pour les rues reprises (au-delà de 3 %)
-  const score = (r) => Math.abs(r.distance / target - 1) + 3 * Math.max(0, r.reused - 0.03);
+  // Note d'une boucle : écart à la distance visée + pénalités pour les rues reprises (au-delà de 3 %)
+  // et surtout pour les grandes routes (nationales, voies rapides…)
+  const score = (r) => Math.abs(r.distance / target - 1) + 3 * Math.max(0, r.reused - 0.03) + 6 * (r.bigRoad || 0);
   let best = null;
   let calls = 0;
   try {
     // Jusqu'à 3 directions (une nouvelle à chaque clic) ; on garde la meilleure
     const first = Math.random() * 360;
-    for (let k = 0; k < 3 && calls < 10; k++) {
-      const bearing = first + k * 120;
+    for (let k = 0; k < 4 && calls < 12; k++) {
+      const bearing = first + k * 90;
       let radius = target / (2 * Math.PI) / 1.3; // les chemins font ≈ 30 % de plus qu'un cercle parfait
-      for (let i = 0; i < 4 && calls < 10; i++) {
+      for (let i = 0; i < 4 && calls < 12; i++) {
         const center = destination(start, radius, bearing);
         const pts = [-90, 0, 90].map((a) => destination(center, radius, bearing + a));
         const r = await routeThrough([start, ...pts, start]);
@@ -835,8 +1106,8 @@ async function makeLoop() {
         radius /= err;
       }
       // Bonne distance et presque pas de rue reprise : inutile d'essayer d'autres directions
-      if (Math.abs(best.distance / target - 1) < 0.04 && best.reused < 0.05) break;
-      status("Recherche d'une boucle sans aller-retour…");
+      if (Math.abs(best.distance / target - 1) < 0.04 && best.reused < 0.05 && !(best.bigRoad > 0.01)) break;
+      status(best.bigRoad > 0.01 ? "Recherche d'une boucle sans grande route…" : "Recherche d'une boucle sans aller-retour…");
     }
     loop = { ...best, profile: null, gain: null, loss: null };
     drawLoop(true);
@@ -867,11 +1138,11 @@ function drawLoop(fit = false) {
   const colors = KIND_COLORS();
   if (workout) {
     // Les étapes sont posées sur la boucle proportionnellement à leur distance
-    const k = total / workout.dist;
+    const k = total / (workout.vDist || 1);
     let from = 0;
     let j = 0;
     for (const s of workout.steps) {
-      const to = from + s.dist * k;
+      const to = from + s.vDist * k;
       const seg = [];
       while (j < line.length - 1 && cum[j + 1] <= from) j++;
       const at = (d) => {
@@ -906,16 +1177,23 @@ function drawLoop(fit = false) {
 function renderLoopStats() {
   $("loopResult").hidden = !loop;
   if (!loop) return;
-  const diff = workout ? loop.distance - workout.dist : 0;
+  const diff = workout?.exact ? loop.distance - workout.dist : 0;
   $("loopDist").textContent = `${fmtNum(loop.distance / 1000, 2)} km`;
   $("loopGain").textContent = loop.gain != null ? `${loop.gain} m` : "…";
   $("loopLoss").textContent = loop.loss != null ? `${loop.loss} m` : "…";
-  $("loopNote").textContent = workout
+  $("loopNote").textContent = workout && !workout.exact
+    ? "La distance exacte de la séance n'est pas connue (étapes sans allure) : la boucle suit la longueur que tu as indiquée."
+    : workout
     ? Math.abs(diff) < 150
       ? "La boucle colle à la distance de ta séance."
       : `${fmtNum(Math.abs(diff) / 1000, 2)} km de ${diff > 0 ? "plus" : "moins"} que la séance : ${diff > 0 ? "finis en marchant ou en trottinant" : "ajoute un petit aller-retour à la fin"}.`
     : "";
-  if (!$("loopName").value) $("loopName").value = `Séance ${workout ? fmtDuration(workout.sec) : ""} · ${fmtNum(loop.distance / 1000, 1)} km`.replace("  ", " ");
+  // Grande route restante : on prévient (nom de la route si on le connaît)
+  if (loop.bigRoad > 0.005) {
+    const where = loop.bigRefs?.length ? ` (${loop.bigRefs.slice(0, 3).join(", ")})` : "";
+    $("loopNote").textContent += ` ⚠️ ${fmtNum(loop.bigMeters / 1000, 1)} km sur une grande route${where} : clique sur « Une autre boucle » pour l'éviter.`;
+  }
+  if (!$("loopName").value) $("loopName").value = `Séance ${workout?.sec ? fmtDuration(workout.sec) : ""} · ${fmtNum(loop.distance / 1000, 1)} km`.replace("  ", " ");
 }
 
 // Altitude : 100 points le long de la boucle (Open-Meteo, gratuit)
@@ -970,7 +1248,7 @@ $("saveLoopBtn").addEventListener("click", () => {
   list.unshift({
     id: Date.now().toString(36),
     name,
-    sport: "run",
+    sport: SPORTS[sport].saveAs,
     waypoints: loop.waypoints,
     snap: true,
     distance: loop.distance,
@@ -1002,7 +1280,7 @@ $("gpxLoopBtn").addEventListener("click", () => {
   <metadata><name>${esc(name)}</name></metadata>
   <trk>
     <name>${esc(name)}</name>
-    <type>running</type>
+    <type>${SPORTS[sport].gpx}</type>
     <trkseg>
       ${pts}
     </trkseg>
@@ -1018,15 +1296,16 @@ $("gpxLoopBtn").addEventListener("click", () => {
 /* ---------- Mémorise la séance et le départ (dans ce navigateur) ---------- */
 function save() {
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify({ text: $("workoutText").value, start, vma: $("vma").value, app: $("appSelect").value, loopKm: loopKmTouched ? $("loopKm").value : "" }));
+    localStorage.setItem(STORE_KEY, JSON.stringify({ text: $("workoutText").value, start, sport, vma: $("vma")?.value, app: $("appSelect")?.value, loopKm: loopKmTouched ? $("loopKm").value : "" }));
   } catch { /* stockage indisponible */ }
 }
 (function load() {
   let saved = null;
   try { saved = JSON.parse(localStorage.getItem(STORE_KEY)); } catch { /* stockage indisponible */ }
   $("workoutText").value = saved?.text ?? EXAMPLE;
-  if (saved?.vma) $("vma").value = saved.vma;
-  if (saved?.app && APPS[saved.app]) $("appSelect").value = saved.app;
+  if (saved?.vma && $("vma")) $("vma").value = saved.vma;
+  if (saved?.sport) setSport(saved.sport);
+  if (saved?.app && APPS[saved.app] && $("appSelect")) $("appSelect").value = saved.app;
   showApp();
   if (saved?.loopKm) {
     $("loopKm").value = saved.loopKm;

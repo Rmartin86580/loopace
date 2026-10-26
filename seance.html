@@ -13,10 +13,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=101">
+  <link rel="stylesheet" href="styles.css?v=112">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="allure.css?v=93">
-  <link rel="stylesheet" href="seance.css?v=100">
+  <link rel="stylesheet" href="allure.css?v=111">
+  <link rel="stylesheet" href="seance.css?v=108">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
   <link rel="stylesheet" href="theme-logo.css?v=93">
 </head>
@@ -31,7 +31,7 @@
       <a href="parcours.html" title="Tracer un parcours" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 19H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5" stroke-dasharray="2.4 3.2"/><circle cx="5.5" cy="19" r="2"/><circle cx="18" cy="5" r="2.6" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Tracer un parcours</span><span class="nav__short">Parcours</span></a>
       <a href="allure.html" title="Calculer mon allure" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="translate(1.5 0)"><circle cx="13" cy="13.5" r="7.5"/><path d="M13 10v3.5l2.5 1.5M11 2.5h4M13 2.5V6"/><path d="M1 11h2.5M0 15h2.5" opacity=".7"/></g></svg><span class="nav__full">Calculer mon allure</span><span class="nav__short">Allure</span></a>
       <a href="seance.html" title="Séance → boucle" class="nav__link is-active" aria-current="page"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h4v-5h4v5h3V7h4v11h5"/><circle cx="15" cy="3.5" r="1.4" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Séance → boucle</span><span class="nav__short">Séance</span></a>
-      <a href="triathlon.html" title="Planificateur triathlon" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2.2-2.8-3.8-4.5-6-4.5a4.5 4.5 0 0 0 0 9c2.2 0 3.8-1.7 6-4.5zm0 0c2.2 2.8 3.8 4.5 6 4.5a4.5 4.5 0 0 0 0-9c-2.2 0-3.8 1.7-6 4.5z"/></svg><span class="nav__full">Triathlon</span><span class="nav__short">Tri</span></a>
+      <a href="triathlon.html" title="Planificateur triathlon (bientôt)" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 12c-2.2-2.8-3.8-4.5-6-4.5a4.5 4.5 0 0 0 0 9c2.2 0 3.8-1.7 6-4.5zm0 0c2.2 2.8 3.8 4.5 6 4.5a4.5 4.5 0 0 0 0-9c-2.2 0-3.8 1.7-6 4.5z"/></svg><span class="nav__full">Triathlon</span><span class="nav__short">Tri</span><em class="nav__soon">Bientôt</em></a>
     </nav>
   </header>
 
@@ -40,7 +40,7 @@
       <div class="container">
         <p class="eyebrow">Outil</p>
         <h1>Séance <span class="grad">→ boucle</span></h1>
-        <p>Colle ta séance de ton coach ou de ta montre : on calcule sa durée et sa distance, puis on te trace une boucle de la bonne longueur qui revient à ton point de départ.</p>
+        <p>Tu as ta séance, il te manque le parcours ? Importe le .fit ou colle le texte, choisis ton point de départ : on te trace la boucle qui va avec.</p>
       </div>
     </section>
 
@@ -50,7 +50,18 @@
         <div class="se-card__head">
           <h2><span class="tri-step">1</span> Ta séance</h2>
         </div>
+        <div class="se-fit">
+          <label class="btn btn--ghost se-small-btn se-fit__btn">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+            Importer un fichier .fit
+            <input type="file" id="fitInput" accept=".fit" hidden>
+          </label>
+          <span>ou glisse-le dans la zone de texte ci-dessous</span>
+        </div>
+        <p class="se-status" id="fitMsg" role="status" hidden></p>
         <textarea id="workoutText" class="se-text" rows="10" spellcheck="false" aria-label="Ta séance, une étape par ligne" placeholder="Warm up&#10;21 min @ 06:19-07:22 min/km&#10;&#10;1. Répéter 12 fois&#10;   1. Hard&#10;1 min @ 03:57-04:08 min/km"></textarea>
+        <!-- Masqué pour l'instant : choix de l'appli (explications + exemples) et champ VMA.
+             Pour les réafficher, retirer ce commentaire : seance.js gère leur absence.
         <div class="se-app">
           <div class="field">
             <label for="appSelect">Ton appli</label>
@@ -86,6 +97,7 @@
           </div>
           <p class="card__hint">Sert quand la séance donne des zones ou des % (VMA, seuil, Z2…) au lieu d'allures.</p>
         </div>
+        -->
         <div class="se-totals" id="workoutTotals"></div>
         <div class="se-bar" id="workoutBar" aria-hidden="true"></div>
         <div class="se-legend" aria-hidden="true">
@@ -99,6 +111,15 @@
       <!-- 2. La boucle -->
       <div class="card se-card">
         <h2><span class="tri-step">2</span> Ta boucle</h2>
+        <div class="se-sport">
+          <span>Sport</span>
+          <div class="seg seg--small" id="sportSeg" role="group" aria-label="Sport de la boucle">
+            <button type="button" data-sport="run" aria-pressed="true">Course à pied</button>
+            <button type="button" data-sport="road" aria-pressed="false">Vélo de route</button>
+            <button type="button" data-sport="mtb" aria-pressed="false">VTT</button>
+            <button type="button" data-sport="gravel" aria-pressed="false">Gravel</button>
+          </div>
+        </div>
         <div class="se-start">
           <form class="se-search" id="searchForm" role="search">
             <input type="search" id="searchInput" placeholder="Point de départ : ville, adresse…" aria-label="Point de départ">
@@ -148,6 +169,7 @@
 
   <script src="script.js?v=93"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="seance.js?v=100"></script>
+  <script src="fit.js?v=101"></script>
+  <script src="seance.js?v=109"></script>
 </body>
 </html>
