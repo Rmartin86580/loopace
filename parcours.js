@@ -12,12 +12,6 @@ const ROUTERS = {
   bike: "https://routing.openstreetmap.de/routed-bike/route/v1/driving/",
   other: "https://routing.openstreetmap.de/routed-foot/route/v1/driving/",
 };
-// Réglette de durée : allure (s/km) en course, vitesse (km/h) à vélo
-const SPORT_UI = {
-  run: { label: "Mon allure", unit: "/km", min: 180, max: 600, step: 5, value: 330, toSec: (v) => v, show: (v) => fmtPace(v) },
-  bike: { label: "Ma vitesse", unit: "km/h", min: 10, max: 45, step: 0.5, value: 25, toSec: (v) => 3600 / v, show: (v) => String(v).replace(".", ",") },
-  other: { label: "Mon allure", unit: "/km", min: 180, max: 900, step: 5, value: 330, toSec: (v) => v, show: (v) => fmtPace(v) },
-};
 let sport = "run";
 const ELEVATION_URL = "https://api.open-meteo.com/v1/elevation";
 const SEARCH_URL = "https://photon.komoot.io/api/";
@@ -232,44 +226,18 @@ map.on("click", (e) => commit([...waypoints, { lat: e.latlng.lat, lng: e.latlng.
 map.on("contextmenu", (e) => commit([...waypoints, { lat: e.latlng.lat, lng: e.latlng.lng, straight: true }]));
 
 /* ---------- Statistiques ---------- */
-// Secondes au km (la vidéo et la durée s'en servent), et le texte « 5:30 /km » ou « 25 km/h »
-const paceSeconds = () => SPORT_UI[sport].toSec(Number($("pace").value));
-const paceText = () => `${SPORT_UI[sport].show(Number($("pace").value))} ${SPORT_UI[sport].unit}`;
-const fmtPace = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-
-function fmtDuration(sec) {
-  const h = Math.floor(sec / 3600);
-  const m = Math.round((sec % 3600) / 60);
-  if (h === 0) return `${m} min`;
-  return `${h} h ${String(m).padStart(2, "0")}`;
-}
-
+// Pas de durée ici : le temps (avec le dénivelé) se calcule dans le calculateur d'allure (bouton « Prédire mes temps »)
 function renderStats() {
   $("distance").textContent = fmtKm(totalDist);
-  $("duration").textContent = totalDist ? fmtDuration((totalDist / 1000) * paceSeconds()) : "—";
   $("gain").textContent = elevation ? `${elevation.gain} m` : "—";
   $("loss").textContent = elevation ? `${elevation.loss} m` : "—";
 }
 
-$("pace").addEventListener("input", () => {
-  $("paceOut").textContent = SPORT_UI[sport].show(Number($("pace").value));
-  paceBySport[sport] = Number($("pace").value);
-  renderStats();
-});
-
 /* ---------- Type de parcours : course, vélo ou autre ---------- */
 const SPORT_NAMES = { run: "Course", bike: "Vélo", other: "Autre" };
-const paceBySport = { run: 330, bike: 25, other: 330 };
 function setSport(next, reroute = true) {
-  sport = SPORT_UI[next] ? next : "run";
+  sport = ROUTERS[next] ? next : "run";
   document.querySelectorAll("[data-rsport]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.rsport === sport)));
-  const ui = SPORT_UI[sport];
-  Object.assign($("pace"), { min: ui.min, max: ui.max, step: ui.step });
-  $("pace").value = paceBySport[sport];
-  $("paceLabel").textContent = ui.label;
-  $("paceUnit").textContent = ui.unit;
-  $("paceOut").textContent = ui.show(Number($("pace").value));
-  renderStats();
   if (reroute) update(); // le vélo suit les routes cyclables : on recalcule le tracé
 }
 $("routeSport").addEventListener("click", (e) => {
@@ -392,6 +360,7 @@ function updateButtons() {
   $("saveBtn").disabled = n < 2;
   $("gpxBtn").disabled = n < 2;
   $("videoBtn").disabled = n < 2;
+  $("predictBtn").disabled = n < 2;
 }
 
 $("undoBtn").addEventListener("click", () => {
@@ -506,11 +475,13 @@ function renderSaved() {
     : `<li class="saved__empty">Aucun parcours enregistré pour l'instant.</li>`;
 }
 
-$("saveBtn").addEventListener("click", () => {
+// Enregistre le parcours dans « Mes parcours » (remplace celui du même nom) ; renvoie son identifiant
+function saveRoute() {
   const name = routeName();
+  const id = Date.now().toString(36);
   const list = readSaved().filter((r) => r.name !== name);
   list.unshift({
-    id: Date.now().toString(36),
+    id,
     name,
     waypoints,
     sport,
@@ -524,11 +495,20 @@ $("saveBtn").addEventListener("click", () => {
     line: route.filter((_, i) => i % Math.ceil(route.length / 1500) === 0 || i === route.length - 1)
       .map(([lat, lng]) => [+lat.toFixed(5), +lng.toFixed(5)]),
   });
-  if (writeSaved(list)) {
-    $("routeName").value = name;
-    renderSaved();
-    toast(`« ${name} » enregistré.`);
-  }
+  if (!writeSaved(list)) return null;
+  $("routeName").value = name;
+  renderSaved();
+  return id;
+}
+
+$("saveBtn").addEventListener("click", () => {
+  if (saveRoute()) toast(`« ${routeName()} » enregistré.`);
+});
+
+// Prédire mes temps : le parcours est enregistré puis ouvert dans le calculateur d'allure (dénivelé compris)
+$("predictBtn").addEventListener("click", () => {
+  const id = saveRoute();
+  if (id) location.href = `allure.html?route=${encodeURIComponent(id)}#routeSection`;
 });
 
 $("savedList").addEventListener("click", (e) => {

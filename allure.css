@@ -292,3 +292,6 @@ td.grade.down { color: #7dd3c0; }
 .chip-custom.is-active { background: var(--grad); color: var(--on-accent); border: 1px solid transparent; font-weight: 600; }
 .chip-custom.is-active input::placeholder { color: var(--on-accent); }
 .chips--step button[aria-pressed="true"] { background: var(--grad); color: var(--on-accent); border-color: transparent; font-weight: 600; }
+
+/* Arrivée depuis l'outil Parcours : le titre ne passe pas sous la barre de menu */
+#routeSection { scroll-margin-top: 72px; }

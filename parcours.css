@@ -76,7 +76,7 @@
 .stats-card__main strong span { font-size: inherit; letter-spacing: 0; text-transform: none; color: var(--text); }
 .stats-card__main em { font-style: normal; font-size: 1.1rem; color: var(--pink); }
 .stats-card__row {
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(2, 1fr);
   margin-top: 16px; padding-top: 16px;
   border-top: 1px solid var(--line);
 }

@@ -4,7 +4,7 @@
    - Rendu image par image (on attend que la carte soit chargée à chaque image),
      encodé en MP4 directement dans le navigateur (WebCodecs + mp4-muxer).
    Rien n'est envoyé sur un serveur : la vidéo est fabriquée sur l'ordinateur.
-   Dépend de parcours.js (route, elevation, routeName, fmtKm, paceSeconds…).
+   Dépend de parcours.js (route, elevation, routeName, fmtKm…).
    ========================================================= */
 const VIDEO_FPS = 30;
 const VIDEO_FORMATS = { landscape: [1920, 1080], portrait: [1080, 1920] };
@@ -225,7 +225,7 @@ const OPTS_KEY = "rotiby-video-opts";
 const OPT_DEFAULTS = {
   zoomOffset: 0, pitch: 60, relief: 1.4, color: VIDEO_PINK,
   intro: true, outro: true, card: true,
-  logo: true, title: true, subtitle: "", distance: true, profile: true, gain: true, time: true,
+  logo: true, title: true, subtitle: "", distance: true, profile: true, gain: true,
 };
 
 function optInputs() {
@@ -577,7 +577,6 @@ function drawOverlay(ctx, track, st, o) {
     ctx.fillText(`${fmtKm(track.total)} km`, W / 2, cyy);
     cyy += 120 * u;
     if (o.gain && track.ele) lines.push(`D+ ${Math.round(track.gain[track.gain.length - 1])} m`);
-    if (o.time) lines.push(`≈ ${fmtDuration((track.total / 1000) * paceSeconds())} à ${paceText()}`);
     if (lines.length) {
       ctx.font = `600 ${28 * u}px Inter`;
       ctx.fillStyle = "rgba(255,255,255,.85)";

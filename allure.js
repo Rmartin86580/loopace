@@ -752,6 +752,28 @@ window.addEventListener("storage", (e) => {
 $("rpGoal").value = rp.goals.time;
 renderRoutePredict();
 
+// Ouvert depuis l'outil Parcours (« Prédire mes temps sur ce parcours ») : parcours et sport présélectionnés
+(function openFromParcours() {
+  const id = new URLSearchParams(location.search).get("route");
+  const route = id && readRoutes().find((r) => r.id === id);
+  if (!route) return;
+  const want = route.sport === "bike" ? "bike" : "run";
+  if (state.sport !== want) {
+    state.sport = want;
+    applySport(false);
+    compute();
+  }
+  renderRoutePredict();
+  $("rpRoute").value = id;
+  renderRoutePredict();
+  history.replaceState(null, "", `${location.pathname}#routeSection`);
+  // Descend jusqu'à « Prédire sur mon parcours » une fois la page entièrement affichée (polices, mise en page)
+  // (saut direct : le défilement « doux » du site est interrompu pendant le chargement)
+  const go = () => $("routeSection").scrollIntoView({ block: "start", behavior: "instant" });
+  if (document.readyState === "complete") setTimeout(go, 50);
+  else window.addEventListener("load", () => setTimeout(go, 50), { once: true });
+})();
+
 /* ---------- Bracelet d'allure (dessin et fenêtre : band.js) ---------- */
 $("bandBtn").addEventListener("click", () => openBand(rp.last));
 $("calcBandBtn").addEventListener("click", () => openBand(calcPlan));
