@@ -1241,10 +1241,16 @@ async function loadElevation() {
    ========================================================= */
 $("saveLoopBtn").addEventListener("click", () => {
   if (!loop) return;
-  const name = $("loopName").value.trim() || "Boucle de séance";
+  let name = $("loopName").value.trim() || "Boucle de séance";
   let list = [];
   try { list = JSON.parse(localStorage.getItem(ROUTES_KEY)) || []; } catch { /* vide */ }
-  list = list.filter((r) => r.name !== name);
+  // Même nom qu'un parcours existant : on ajoute un numéro au lieu de l'écraser
+  if (list.some((r) => r.name === name)) {
+    let n = 2;
+    while (list.some((r) => r.name === `${name} (${n})`)) n++;
+    name = `${name} (${n})`;
+    $("loopName").value = name;
+  }
   list.unshift({
     id: Date.now().toString(36),
     name,

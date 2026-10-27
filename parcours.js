@@ -139,6 +139,7 @@ async function getSegment(a, b) {
 
 async function update() {
   const v = ++version;
+  updateStartPlace();
   renderMarkers();
   updateButtons();
   $("mapHint").hidden = waypoints.length > 0;
@@ -229,6 +230,7 @@ map.on("contextmenu", (e) => commit([...waypoints, { lat: e.latlng.lat, lng: e.l
 // Pas de durée ici : le temps (avec le dénivelé) se calcule dans le calculateur d'allure (bouton « Prédire mes temps »)
 function renderStats() {
   $("distance").textContent = fmtKm(totalDist);
+  showAutoName();
   $("gain").textContent = elevation ? `${elevation.gain} m` : "—";
   $("loss").textContent = elevation ? `${elevation.loss} m` : "—";
 }
@@ -368,7 +370,11 @@ $("undoBtn").addEventListener("click", () => {
   waypoints = history.pop();
   update();
 });
-$("clearBtn").addEventListener("click", () => commit([]));
+$("clearBtn").addEventListener("click", () => {
+  commit([]);
+  currentId = null; // le prochain enregistrement sera un nouveau parcours
+  $("routeName").value = "";
+});
 $("loopBtn").addEventListener("click", () => commit([...waypoints, { lat: waypoints[0].lat, lng: waypoints[0].lng }]));
 // Retour par le même chemin : un tronçon fait en ligne droite à l'aller l'est aussi au retour
 $("backBtn").addEventListener("click", () => commit([
@@ -415,8 +421,35 @@ $("locateBtn").addEventListener("click", () => {
 });
 
 /* ---------- Export GPX ---------- */
+/* ---------- Nom du parcours ----------
+   Celui que tu tapes, sinon « Ville · 10,4 km · 27 oct. » (ville du départ, retrouvée par Photon). */
+let startPlace = "";   // ville du point de départ
+let placeFor = "";     // point de départ pour lequel la ville a été cherchée
+const today = () => new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+function autoName() {
+  return [startPlace, `${fmtKm(totalDist, 1)} km`, today()].filter(Boolean).join(" · ");
+}
 function routeName() {
-  return $("routeName").value.trim() || `Parcours ${fmtKm(totalDist, 1)} km`;
+  return $("routeName").value.trim() || autoName();
+}
+// Cherche la ville du départ quand il change (une seule requête par point)
+async function updateStartPlace() {
+  const p = waypoints[0];
+  const key = p ? `${p.lat.toFixed(4)},${p.lng.toFixed(4)}` : "";
+  if (key === placeFor) return;
+  placeFor = key;
+  startPlace = "";
+  if (p) {
+    try {
+      const j = await fetch(`${SEARCH_URL.replace("/api/", "/reverse")}?lon=${p.lng}&lat=${p.lat}&limit=1&lang=fr`, { signal: AbortSignal.timeout(6000) }).then((r) => r.json());
+      const props = j.features?.[0]?.properties || {};
+      if (placeFor === key) startPlace = props.city || props.town || props.village || props.county || "";
+    } catch { /* pas de ville : le nom garde la distance et la date */ }
+  }
+  showAutoName();
+}
+function showAutoName() {
+  $("routeName").placeholder = waypoints.length > 1 && totalDist > 0 ? `Nom du parcours (sinon « ${autoName()} »)` : "Nom du parcours";
 }
 
 $("gpxBtn").addEventListener("click", () => {
@@ -475,14 +508,31 @@ function renderSaved() {
     : `<li class="saved__empty">Aucun parcours enregistré pour l'instant.</li>`;
 }
 
-// Enregistre le parcours dans « Mes parcours » (remplace celui du même nom) ; renvoie son identifiant
+// Parcours de « Mes parcours » actuellement ouvert (ou déjà enregistré) : on le met à jour au lieu d'en créer un autre
+let currentId = null;
+let lastSavedName = "";
+
+// Nom libre dans la liste : « Lyon · 10,4 km · 27 oct. (2) » si un autre parcours porte déjà ce nom
+function uniqueName(name, list, ownId) {
+  const taken = new Set(list.filter((r) => r.id !== ownId).map((r) => r.name));
+  if (!taken.has(name)) return name;
+  let n = 2;
+  while (taken.has(`${name} (${n})`)) n++;
+  return `${name} (${n})`;
+}
+
+// Enregistre le parcours dans « Mes parcours » ; renvoie son identifiant
 function saveRoute() {
-  const name = routeName();
-  const id = Date.now().toString(36);
-  const list = readSaved().filter((r) => r.name !== name);
+  const saved = readSaved();
+  const updating = currentId && saved.some((r) => r.id === currentId);
+  const id = updating ? currentId : Date.now().toString(36);
+  const auto = !$("routeName").value.trim(); // pas de nom tapé : nom automatique
+  const name = uniqueName(routeName(), saved, id);
+  const list = saved.filter((r) => r.id !== id); // l'ancienne version de CE parcours seulement
   list.unshift({
     id,
     name,
+    autoName: auto,
     waypoints,
     sport,
     snap: $("snap").checked,
@@ -496,13 +546,16 @@ function saveRoute() {
       .map(([lat, lng]) => [+lat.toFixed(5), +lng.toFixed(5)]),
   });
   if (!writeSaved(list)) return null;
-  $("routeName").value = name;
+  currentId = id;
+  lastSavedName = name;
+  $("routeName").value = auto ? "" : name; // nom automatique : il suivra les modifications du parcours
   renderSaved();
   return id;
 }
 
 $("saveBtn").addEventListener("click", () => {
-  if (saveRoute()) toast(`« ${routeName()} » enregistré.`);
+  const updating = currentId && readSaved().some((r) => r.id === currentId);
+  if (saveRoute()) toast(`« ${lastSavedName} » ${updating ? "mis à jour" : "enregistré"}.`);
 });
 
 // Prédire mes temps : le parcours est enregistré puis ouvert dans le calculateur d'allure (dénivelé compris)
@@ -516,12 +569,14 @@ $("savedList").addEventListener("click", (e) => {
   const del = e.target.closest("[data-delete]");
   if (del) {
     writeSaved(readSaved().filter((r) => r.id !== del.dataset.delete));
+    if (del.dataset.delete === currentId) currentId = null;
     renderSaved();
   } else if (load) {
     const r = readSaved().find((x) => x.id === load.dataset.load);
     if (!r) return;
     $("snap").checked = r.snap;
-    $("routeName").value = r.name;
+    $("routeName").value = r.autoName ? "" : r.name; // nom automatique : refait à l'enregistrement
+    currentId = r.id;
     setSport(r.sport || "run", false);
     savedLine = r.line?.length > 1 ? { waypoints: r.waypoints, line: r.line } : null;
     commit(r.waypoints);
