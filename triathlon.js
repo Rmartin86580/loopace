@@ -828,7 +828,8 @@ function raceSheetHtml() {
     ? `<p class="small">${lastFuel.stats.map(([k, v, sub]) => `<b>${esc(k)}</b> ${esc(v)} <span>(${esc(sub)})</span>`).join(" · ")}</p>
        <table class="fuel"><tbody>${lastFuel.events.map((e) => `<tr><td>${fmtClock(race.start, e.at)}</td><td>${esc(e.where)}</td><td>${esc(e.what)}</td></tr>`).join("")}</tbody></table>`
     : "";
-  const logo = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(LOGO_INFINITY_SVG)}`;
+  const logo = LOGO_ON_LIGHT;
+  const ink = "#4d7c0f"; // citron assombri : lisible sur le papier
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche jour de course</title><style>
     @page { size: A4; margin: 12mm; }
     * { box-sizing: border-box; }
@@ -836,9 +837,9 @@ function raceSheetHtml() {
     header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid ${ACCENT}; padding-bottom: 6px; margin-bottom: 10px; }
     h1 { margin: 0; font-size: 18pt; }
     header p { margin: 2px 0 0; color: #555; }
-    .big { font-size: 22pt; font-weight: 800; color: ${ACCENT}; text-align: right; line-height: 1; }
+    .big { font-size: 22pt; font-weight: 800; color: ${ink}; text-align: right; line-height: 1; }
     .big small { display: block; font-size: 9pt; color: #555; font-weight: 600; }
-    h2 { font-size: 11pt; margin: 12px 0 5px; text-transform: uppercase; letter-spacing: .06em; color: ${ACCENT}; }
+    h2 { font-size: 11pt; margin: 12px 0 5px; text-transform: uppercase; letter-spacing: .06em; color: ${ink}; }
     table { width: 100%; border-collapse: collapse; }
     td, th { padding: 3px 6px; border-bottom: 1px solid #e6e0e6; text-align: left; vertical-align: top; }
     th { font-size: 8pt; text-transform: uppercase; color: #777; }
@@ -854,7 +855,7 @@ function raceSheetHtml() {
     .nowrap td { white-space: nowrap; }
     .fuel td:nth-child(2) { white-space: nowrap; }
     footer { margin-top: 12px; display: flex; align-items: center; gap: 6px; color: #777; font-size: 8pt; }
-    footer img { height: 12px; }
+    footer img { height: 14px; }
   </style></head><body>
     <header>
       <div>

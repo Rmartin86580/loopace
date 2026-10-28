@@ -1,0 +1,125 @@
+/* =========================================================
+   THÈME CLAIR — activé par le bouton soleil/lune du menu
+   (attribut data-theme="light" sur <html>, choix gardé dans
+   localStorage « loopace-theme »). Le thème sombre reste celui
+   par défaut : ce fichier ne fait rien tant qu'on ne l'a pas choisi.
+   ========================================================= */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --black: #F7FAEF;                /* blanc doux : fond de page */
+  --black-2: #edf2e2;              /* sections alternées, pied de page */
+  --black-3: #ffffff;              /* cartes, champs */
+  --line: rgba(21, 41, 31, .13);
+  --text: #15291F;                 /* vert sombre */
+  --muted: #536459;
+  --pink: #4d7c0f;                 /* citron assombri : lisible en texte sur fond clair */
+  --lilac: #1f8a4c;
+  --grad: linear-gradient(135deg, #c6ee4c 0%, #a3d629 100%);  /* boutons : citron, texte vert sombre */
+  --grad-text: linear-gradient(135deg, #5a8f0e 0%, #2f7a3a 100%);
+  --accent-rgb: 77, 124, 15;
+  --accent2-rgb: 31, 138, 76;
+  --on-accent: #15291F;
+  --se-warm: #97a99b;
+  --up: #c2410c;                   /* montée */
+  --down: #0f766e;                 /* descente */
+  --error: #c62828;
+  --warn: #b45309;
+}
+
+/* ----- Logo : version texte sombre ----- */
+[data-theme="light"] .logo__img--on-dark { display: none; }
+[data-theme="light"] .logo__img--on-light { display: block; }
+
+/* ----- Bandeaux et pastilles posés sur la page ou la carte ----- */
+[data-theme="light"] .nav { background: rgba(247, 250, 239, .9); }
+[data-theme="light"] .map-pill,
+[data-theme="light"] .se-map__hint,
+[data-theme="light"] .icon-btn,
+[data-theme="light"] .h-mock__stat { background: rgba(255, 255, 255, .9); }
+[data-theme="light"] .leaflet-control-attribution { background: rgba(255, 255, 255, .8) !important; }
+[data-theme="light"] .leaflet-control-layers,
+[data-theme="light"] .leaflet-bar { box-shadow: 0 8px 24px rgba(21, 41, 31, .15) !important; }
+[data-theme="light"] #map { background: #e6ecda; }
+[data-theme="light"] #profileCursor { stroke: var(--text); }
+
+/* ----- Menus déroulants ----- */
+[data-theme="light"] select { color-scheme: light; }
+[data-theme="light"] select option,
+[data-theme="light"] select optgroup { background-color: #ffffff; color: var(--text); }
+[data-theme="light"] select optgroup { color: var(--pink); }
+[data-theme="light"] .tri-clock input[type="time"] { color-scheme: light; }
+
+/* ----- Couleurs montée / descente, erreurs et alertes ----- */
+[data-theme="light"] td.grade.up,
+[data-theme="light"] .tri-grade--up,
+[data-theme="light"] .h-bars__legend .up { color: var(--up); }
+[data-theme="light"] td.grade.down,
+[data-theme="light"] .tri-grade--down,
+[data-theme="light"] .h-bars__legend .down { color: var(--down); }
+[data-theme="light"] .h-bars__grid div::before { background: linear-gradient(180deg, rgba(21, 41, 31, .35), rgba(21, 41, 31, .08)); }
+[data-theme="light"] .h-bars__grid div.up::before { background: linear-gradient(180deg, #ea7a62, rgba(234, 122, 98, .2)); }
+[data-theme="light"] .h-bars__grid div.down::before { background: linear-gradient(180deg, #2fa596, rgba(47, 165, 150, .2)); }
+[data-theme="light"] .se-status.is-error,
+[data-theme="light"] .tri-goal__msg.is-error,
+[data-theme="light"] .tri-gate__error { color: var(--error); }
+[data-theme="light"] .tri-leg .field.is-warn .field__input { border-color: var(--warn); }
+[data-theme="light"] .tri-leg .field small.field__warn { color: var(--warn); }
+[data-theme="light"] .tool--danger svg { color: var(--error); }
+[data-theme="light"] .saved__delete:hover { color: var(--error); border-color: var(--error); }
+[data-theme="light"] .tri-block { --c-t: #9aa69c; }
+
+/* ----- Accueil ----- */
+[data-theme="light"] .h-hero__bg {
+  background:
+    radial-gradient(circle at 75% 40%, rgba(var(--accent-rgb), .18), transparent 45%),
+    radial-gradient(circle at 10% 90%, rgba(var(--accent2-rgb), .1), transparent 40%),
+    linear-gradient(90deg, var(--black) 20%, rgba(247, 250, 239, .6) 60%, rgba(247, 250, 239, .85));
+}
+[data-theme="light"] .h-mock__window { border-color: var(--line); box-shadow: 0 40px 80px -20px rgba(21, 41, 31, .25), 0 0 0 1px rgba(var(--accent-rgb), .08); }
+[data-theme="light"] .h-mock__bar span { background: #cfd8c4; }
+[data-theme="light"] .h-mock__map { background: radial-gradient(circle at 60% 40%, rgba(var(--accent-rgb), .08), transparent 60%), #e9efdd; }
+[data-theme="light"] .h-streets path,
+[data-theme="light"] .h-streets-sm { stroke: rgba(21, 41, 31, .09); }
+[data-theme="light"] .h-runner { fill: #fff; }
+[data-theme="light"] .h-band,
+[data-theme="light"] .h-mini-band,
+[data-theme="light"] .h-bars { box-shadow: 0 24px 50px -16px rgba(21, 41, 31, .22); }
+[data-theme="light"] .h-band,
+[data-theme="light"] .h-mini-band { border: 1px solid var(--line); }
+[data-theme="light"] .h-mini-video { background: linear-gradient(160deg, rgba(var(--accent-rgb), .55), rgba(21, 41, 31, .85)); border-color: var(--line); }
+[data-theme="light"] .h-final {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), .16), transparent 60%),
+    #ffffff;
+}
+
+/* ----- Ombres trop lourdes sur fond clair ----- */
+[data-theme="light"] .band-canvas { box-shadow: 0 8px 24px rgba(21, 41, 31, .18); }
+[data-theme="light"] .band-preview--band { background: #e6ecda; }
+
+/* ----- Bouton de choix du thème (dans le menu) ----- */
+.theme-toggle {
+  flex: none;
+  display: grid; place-items: center;
+  width: 40px; height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.theme-toggle:hover { border-color: rgba(var(--accent-rgb), .6); background: rgba(var(--accent-rgb), .08); }
+.theme-toggle svg { width: 18px; height: 18px; }
+.theme-toggle .theme-toggle__sun { display: none; }
+[data-theme="light"] .theme-toggle .theme-toggle__sun { display: block; }
+[data-theme="light"] .theme-toggle .theme-toggle__moon { display: none; }
+/* Petits écrans : icônes seules (la page en cours reste en dégradé) pour faire de la place au bouton */
+@media (max-width: 660px) {
+  .nav { gap: 8px; }
+  .nav__links { gap: 6px; }
+  .nav__link.is-active { padding: 9px; }
+  .nav__link.is-active .nav__short { display: none; }
+  .theme-toggle { width: 36px; height: 36px; }
+}

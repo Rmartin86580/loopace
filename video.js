@@ -8,7 +8,7 @@
    ========================================================= */
 const VIDEO_FPS = 30;
 const VIDEO_FORMATS = { landscape: [1920, 1080], portrait: [1080, 1920] };
-const VIDEO_PINK = ACCENT;
+const VIDEO_PINK = "#b7e532"; // citron Loopace : la vidéo est toujours sur fond sombre, quel que soit le thème du site
 
 const vm = {
   choice: "landscape", // ce que l'utilisateur veut : landscape, portrait ou both
@@ -146,7 +146,7 @@ function create3dMap() {
         runner: { type: "geojson", data: empty },
       },
       layers: [
-        { id: "bg", type: "background", paint: { "background-color": "#0b0b0c" } },
+        { id: "bg", type: "background", paint: { "background-color": "#15291F" } },
         { id: "sat", type: "raster", source: "sat", paint: { "raster-saturation": -0.2, "raster-brightness-max": 0.85 } },
         { id: "full", type: "line", source: "full", layout: { "line-join": "round", "line-cap": "round" },
           paint: { "line-color": "#ffffff", "line-opacity": 0.5, "line-width": 4 } },
@@ -244,7 +244,7 @@ function loadOpts() {
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(OPTS_KEY)) || {}; } catch { /* stockage indisponible */ }
   // L'ancienne couleur par défaut suit le thème du site
-  if (saved.color && saved.color.toLowerCase() === "#d885cc") delete saved.color;
+  if (saved.color && ["#d885cc", "#ff2e7e"].includes(saved.color.toLowerCase())) delete saved.color; // anciennes couleurs du thème
   const o = { ...OPT_DEFAULTS, ...saved };
   for (const el of optInputs()) {
     if (!(el.name in o)) continue;
@@ -379,40 +379,25 @@ function drawTabular(ctx, text, x, y, digitW) {
   ctx.textAlign = "left";
 }
 
-/* Logo complet (« L » + boucle ∞ + « PACE ») dessiné dans la vidéo, à la taille de police fs.
-   Le nom est coupé autour du « OO », remplacé par l'image de la boucle. */
-function wordmarkParts() {
-  const name = BRAND.toUpperCase();
-  const i = name.indexOf("OO");
-  return vm.inf && i >= 0 ? [name.slice(0, i), name.slice(i + 2)] : null;
-}
+/* Logo Loopace (texte clair) dessiné dans la vidéo ; fs = hauteur des lettres */
 function wordmarkWidth(ctx, fs) {
-  ctx.font = `italic 900 ${fs}px "Exo 2"`;
-  const parts = wordmarkParts();
-  if (!parts) return ctx.measureText(BRAND.toUpperCase()).width;
-  const infW = fs * 1.2 * (vm.inf.width / vm.inf.height);
-  return ctx.measureText(parts[0]).width + fs * 0.03 + infW + ctx.measureText(parts[1]).width;
+  if (!vm.inf) {
+    ctx.font = `800 ${fs}px Syne`;
+    return ctx.measureText(BRAND).width;
+  }
+  return fs * 1.3 * (vm.inf.width / vm.inf.height);
 }
 function drawWordmark(ctx, x, top, fs) {
-  ctx.save();
-  ctx.font = `italic 900 ${fs}px "Exo 2"`;
-  ctx.fillStyle = "#ffffff";
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  const base = top + fs * 0.95; // ligne de base des lettres
-  const parts = wordmarkParts();
-  if (!parts) {
-    ctx.fillText(BRAND.toUpperCase(), x, base);
-  } else {
-    ctx.fillText(parts[0], x, base);
-    x += ctx.measureText(parts[0]).width + fs * 0.03;
-    const ih = fs * 1.2;
-    const iw = ih * (vm.inf.width / vm.inf.height);
-    ctx.drawImage(vm.inf, x, base - fs * 0.36 - ih / 2, iw, ih); // centrée sur les majuscules
-    x += iw;
-    ctx.fillText(parts[1], x, base);
+  if (!vm.inf) {
+    ctx.save();
+    ctx.font = `800 ${fs}px Syne`;
+    ctx.fillStyle = "#F7FAEF";
+    ctx.textBaseline = "top";
+    ctx.fillText(BRAND, x, top);
+    ctx.restore();
+    return;
   }
-  ctx.restore();
+  ctx.drawImage(vm.inf, x, top, wordmarkWidth(ctx, fs), fs * 1.3);
 }
 
 function drawOverlay(ctx, track, st, o) {
@@ -465,7 +450,7 @@ function drawOverlay(ctx, track, st, o) {
     const textMax = maxW - (tx - m) - 20 * u;
     const boxW = tx - m + Math.min(textW, textMax) + 24 * u;
     const boxH = rows.reduce((h, r) => h + r.h, 0) + 28 * u;
-    ctx.fillStyle = "rgba(11,11,12,.62)";
+    ctx.fillStyle = "rgba(21,41,31,.62)";
     roundRect(ctx, m, m, boxW, boxH, 20 * u);
     ctx.fill();
     let y = m + 14 * u;
@@ -546,7 +531,7 @@ function drawOverlay(ctx, track, st, o) {
     let ch = 300 * u + (o.logo ? cardFs * 1.4 : 0) + (o.subtitle ? 40 * u : 0);
     const cx = (W - cw) / 2;
     const cy = (H - ch) / 2;
-    ctx.fillStyle = "rgba(11,11,12,.9)";
+    ctx.fillStyle = "rgba(21,41,31,.9)";
     roundRect(ctx, cx, cy, cw, ch, 32 * u);
     ctx.fill();
     ctx.strokeStyle = hexToRgba(o.color, 0.6);
@@ -601,7 +586,7 @@ function drawProfile(ctx, track, done, o, box) {
   const py = (ele) => bottom - ((ele - min) / range) * (bottom - top);
 
   // Fond
-  ctx.fillStyle = "rgba(11,11,12,.55)";
+  ctx.fillStyle = "rgba(21,41,31,.55)";
   roundRect(ctx, x, y, w, h, 18 * u);
   ctx.fill();
 
@@ -986,7 +971,7 @@ async function openVideoModal() {
   try {
     await loadVideoLibs();
     // Icône et boucle ∞ du logo (SVG intégré : fonctionne aussi en file://)
-    if (!vm.logo) [vm.logo, vm.inf] = await Promise.all([svgImage(LOGO_ICON_SVG), svgImage(LOGO_INFINITY_SVG)]);
+    if (!vm.logo) [vm.logo, vm.inf] = await Promise.all([dataImage(LOGO_ICON), dataImage(LOGO_ON_DARK)]);
     if (!vm.map3d) await create3dMap();
     await refreshPreview();
   } catch (e) {

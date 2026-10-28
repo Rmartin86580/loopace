@@ -1,17 +1,17 @@
-/* ===== DA Loopace : noir & rose ===== */
+/* ===== DA Loopace : vert sombre & citron (couleurs finales dans theme-logo.css) ===== */
 :root {
-  --black: #0b0b0c;
-  --black-2: #121214;
-  --black-3: #1a1a1d;
-  --line: rgba(255, 255, 255, 0.08);
-  --text: #f4eef3;
-  --muted: #a49ba3;
-  --pink: #d885cc;          /* rose du logo */
-  --lilac: #c98bef;         /* reflet violet du logo */
+  --black: #15291F;
+  --black-2: #1a3126;
+  --black-3: #20392d;
+  --line: rgba(247, 250, 239, .1);
+  --text: #F7FAEF;
+  --muted: #a9b7a6;
+  --pink: #B7E532;          /* citron vert du logo */
+  --lilac: #4cb873;         /* vert moyen */
   --grad: linear-gradient(135deg, var(--pink) 0%, var(--lilac) 100%);
   --grad-text: var(--grad);          /* dégradé utilisé sur du texte */
-  --accent-rgb: 216, 133, 204;       /* = --pink, pour les transparences rgba() */
-  --accent2-rgb: 201, 139, 239;      /* = --lilac */
+  --accent-rgb: 183, 229, 50;        /* = --pink, pour les transparences rgba() */
+  --accent2-rgb: 76, 184, 115;       /* = --lilac */
   --on-accent: var(--black);         /* texte posé sur un fond d'accent */
   --radius: 18px;
   --font-display: "Syne", system-ui, sans-serif;
@@ -98,12 +98,13 @@ p { margin: 0 0 1em; color: var(--muted); }
   justify-content: space-between;
   gap: 16px;
   padding: 12px max(16px, calc((100% - 1120px) / 2));
-  background: rgba(11, 11, 12, .88);
+  background: rgba(21, 41, 31, .88);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
 }
-.nav__brand { display: flex; align-items: center; flex: none; }
+.nav__brand { display: flex; flex-direction: column; align-items: center; flex: none; }
+.nav__brand .logo { font-size: 1.75rem; }
 .nav__links { display: flex; align-items: center; gap: 8px; }
 .nav__link {
   display: inline-flex; align-items: center; gap: 8px;
@@ -163,11 +164,24 @@ p { margin: 0 0 1em; color: var(--muted); }
   letter-spacing: .01em;
   color: var(--text);
 }
-.logo .logo__inf,
-.nav__brand .logo .logo__inf { width: auto; height: 1.2em; margin: -.1em 0 -.1em .03em; }
+/* Logo du kit : image texte clair (thème sombre) ou texte sombre (thème clair) */
+.logo__img { display: block; width: auto; height: 1.2em; }
+.logo__img--on-light { display: none; }
+.foot-icon { border-radius: 22%; }
 
+/* Écrans moyens : menu un peu resserré pour garder le bouton clair/sombre visible */
+@media (max-width: 1120px) {
+  .nav__links { gap: 6px; }
+  .nav__link { padding: 9px 12px; }
+  .nav__full { display: none; }
+  .nav__short { display: inline; }
+}
+@media (max-width: 900px) {
+  .nav__links { gap: 4px; }
+  .nav .logo { font-size: 1.45rem; }
+}
 /* Petits écrans : libellés courts, mais toujours visibles */
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .nav { gap: 10px; }
   .nav .logo { font-size: 1.2rem; }
   .nav__link { padding: 8px 12px; font-size: .85rem; gap: 6px; }
@@ -175,8 +189,8 @@ p { margin: 0 0 1em; color: var(--muted); }
   .nav__short { display: inline; }
 }
 /* Très petits écrans : icônes seules, sauf la page en cours qui garde son nom */
-@media (max-width: 480px) {
-  .nav .logo { font-size: 1.05rem; }
+@media (max-width: 660px) {
+  .nav .logo { font-size: 1.2rem; }
   .nav__link { padding: 9px; }
   .nav__link .nav__short { display: none; }
   .nav__link.is-active { padding: 8px 12px; }
@@ -198,10 +212,13 @@ p { margin: 0 0 1em; color: var(--muted); }
 /* ----- Menus déroulants : liste sombre et lisible (en-têtes de groupe compris) ----- */
 select { color-scheme: dark; }
 select option,
-select optgroup { background-color: #121214; color: #f4eef3; }
+select optgroup { background-color: var(--black-2); color: var(--text); }
 select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
 
 /* ----- Pastille « Bientôt » dans le menu (page en préparation) ----- */
 .nav__soon { margin-left: 2px; padding: .15em .5em; border-radius: 999px; background: rgba(var(--accent-rgb), .15); color: var(--pink); font: 700 .6rem var(--font-body); font-style: normal; letter-spacing: .06em; text-transform: uppercase; }
-.nav__link.is-active .nav__soon { background: rgba(255, 255, 255, .22); color: var(--on-accent); }
-@media (max-width: 480px) { .nav__soon { display: none; } }
+.nav__link.is-active .nav__soon { background: rgba(21, 41, 31, .15); color: var(--on-accent); }
+@media (max-width: 660px) { .nav__soon { display: none; } }
+@media (max-width: 370px) {
+  .nav .logo { font-size: 1.05rem; }
+}

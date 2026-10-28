@@ -1,17 +1,22 @@
 /* =========================================================
-   THÈME « COULEURS DU LOGO » — dégradé rose → violet (sans bleu)
-   Remplace les couleurs d'accent de styles.css.
-   ↩ Pour revenir au rose pâle d'origine : supprimer la ligne
-     <link rel="stylesheet" href="theme-logo.css…"> dans index.html,
-     parcours.html et allure.html.
+   THÈME LOOPACE — palette du kit logo (LIRE-MOI.txt)
+     Citron vert #B7E532 · Vert sombre #15291F · Blanc doux #F7FAEF
+   Thème sombre (par défaut). Le thème clair est dans theme-light.css.
+   Boutons : citron avec texte vert sombre.
    ========================================================= */
 :root {
-  --pink: #ff2e7e;                 /* rose vif du logo */
-  --lilac: #a020f0;                /* violet (on s'arrête avant le bleu) */
-  --grad: linear-gradient(135deg, #ff2e7e 0%, #a020f0 100%);
-  /* sur du texte, un peu plus clair pour rester lisible sur fond noir */
-  --grad-text: linear-gradient(135deg, #ff4d8f 0%, #c04cf5 100%);
-  --accent-rgb: 255, 46, 126;
-  --accent2-rgb: 160, 32, 240;
-  --on-accent: #ffffff;            /* texte blanc sur le dégradé */
+  --black: #15291F;                /* vert sombre : fond de page */
+  --black-2: #1a3126;              /* sections alternées, pied de page */
+  --black-3: #20392d;              /* cartes, champs */
+  --line: rgba(247, 250, 239, .1);
+  --text: #F7FAEF;                 /* blanc doux */
+  --muted: #a9b7a6;
+  --pink: #B7E532;                 /* citron vert : accent principal */
+  --lilac: #4cb873;                /* vert moyen : second accent (efforts faciles, vélo…) */
+  --grad: linear-gradient(135deg, #c6ee4c 0%, #a3d629 100%);
+  --grad-text: linear-gradient(135deg, #c6ee4c 0%, #9fdc3a 100%);
+  --accent-rgb: 183, 229, 50;
+  --accent2-rgb: 76, 184, 115;
+  --on-accent: #15291F;            /* texte vert sombre sur le citron */
+  --se-warm: #6f8a78;              /* échauffement : vert grisé */
 }

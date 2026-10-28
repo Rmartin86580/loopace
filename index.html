@@ -8,22 +8,25 @@
   <meta name="tdm-reservation" content="1">
   <title>Loopace — Prépare ta course au mètre près</title>
   <meta name="description" content="Loopace : trace tes parcours de course, calcule ton allure en tenant compte du dénivelé, imprime ton bracelet d'allure et crée la vidéo 3D de ta sortie. Gratuit, sans inscription.">
-  <link rel="icon" type="image/svg+xml" href="assets/logo-loop.svg">
-  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/loopace-icone-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/loopace-icone-192.png">
+  <link rel="apple-touch-icon" href="assets/loopace-icone-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=112">
-  <link rel="stylesheet" href="home.css?v=103">
+  <link rel="stylesheet" href="styles.css?v=138">
+  <link rel="stylesheet" href="home.css?v=130">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
-  <link rel="stylesheet" href="theme-logo.css?v=93">
+  <link rel="stylesheet" href="theme-logo.css?v=130">
+  <link rel="stylesheet" href="theme-light.css?v=137">
+  <script>try { if (localStorage.getItem("loopace-theme") === "light") document.documentElement.dataset.theme = "light"; } catch (e) {}</script>
 </head>
 <body class="page-home">
   <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="lpGrad" gradientUnits="userSpaceOnUse" x1="2" y1="3" x2="22" y2="21"><stop offset="0" style="stop-color:var(--pink)"/><stop offset="1" style="stop-color:var(--lilac)"/></linearGradient></defs></svg>
 
   <header class="nav" id="nav">
     <a href="#accueil" class="nav__brand" aria-label="Loopace — accueil">
-      <span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span>
+      <span class="logo"><img class="logo__img logo__img--on-dark" src="assets/loopace-logo-clair.png" alt="Loopace" width="502" height="104"><img class="logo__img logo__img--on-light" src="assets/loopace-logo-sombre.png" alt="" width="502" height="104"></span>
     </a>
     <nav class="nav__links" aria-label="Outils">
       <a href="parcours.html" title="Tracer un parcours" class="nav__link"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 19H14a3.5 3.5 0 0 0 0-7h-4a3.5 3.5 0 0 1 0-7h5.5" stroke-dasharray="2.4 3.2"/><circle cx="5.5" cy="19" r="2"/><circle cx="18" cy="5" r="2.6" class="ico-dot" fill="url(#lpGrad)" stroke="none"/></svg><span class="nav__full">Tracer un parcours</span><span class="nav__short">Parcours</span></a>
@@ -126,7 +129,7 @@
         <div class="h-head reveal">
           <p class="eyebrow">Les outils</p>
           <h2>Tout ce qu'il faut <span class="grad">avant le départ</span></h2>
-          <p>Trois outils qui se parlent : ce que tu traces sur la carte se retrouve dans le calculateur, puis sur ton poignet.</p>
+          <p>Quatre outils qui se parlent : ce que tu traces ou importes se retrouve dans le calculateur, puis sur ton poignet.</p>
         </div>
 
         <div class="h-tools">
@@ -147,6 +150,24 @@
             </div>
           </a>
 
+          <a class="h-tool reveal" href="seance.html">
+            <div class="h-tool__visual h-tool__visual--seance" aria-hidden="true">
+              <div class="h-seance">
+                <i class="w" style="flex-grow:5"></i><i class="h"></i><i class="e"></i><i class="h"></i><i class="e"></i><i class="h"></i><i class="e"></i><i class="h"></i><i class="e"></i><i class="c" style="flex-grow:4"></i>
+              </div>
+              <svg viewBox="0 0 120 60" class="h-seance__loop">
+                <path d="M20 46 C8 30 18 10 40 12 S78 4 96 16 S112 46 88 50 S40 56 20 46Z"/>
+                <circle cx="20" cy="46" r="4"/>
+              </svg>
+            </div>
+            <div class="h-tool__body">
+              <span class="h-tool__tag">Nouveau · Séance → boucle</span>
+              <h3>Ta séance, ta boucle</h3>
+              <p>Importe le .fit de ta séance ou colle-la en texte : on trace une boucle de la bonne longueur au départ de chez toi, étape par étape, loin des grandes routes.</p>
+              <span class="h-tool__link">Créer ma boucle →</span>
+            </div>
+          </a>
+
           <a class="h-tool reveal" href="allure.html">
             <div class="h-tool__visual h-tool__visual--pace" aria-hidden="true">
               <div class="h-pace">
@@ -158,7 +179,7 @@
             <div class="h-tool__body">
               <span class="h-tool__tag">Allure</span>
               <h3>Calcule ton allure</h3>
-              <p>Temps, allure ou distance : entre deux valeurs, on calcule la troisième. Course, natation, vélo, et prédiction de tes chronos.</p>
+              <p>Temps, allure ou distance : entre deux valeurs, on calcule la troisième. Course, natation, vélo, et tes temps de passage sur ton parcours, montées comprises.</p>
               <span class="h-tool__link">Ouvrir le calculateur →</span>
             </div>
           </a>
@@ -221,7 +242,7 @@
     <section class="section">
       <div class="container">
         <div class="h-final reveal">
-          <img src="assets/logo-loop.svg" alt="" width="72" height="72">
+          <img src="assets/loopace-icone-192.png" alt="" width="72" height="72" class="foot-icon">
           <h2>Ta prochaine boucle <span class="grad">commence ici.</span></h2>
           <p>Gratuit, sans inscription, directement dans ton navigateur.</p>
           <div class="h-hero__actions">
@@ -236,19 +257,20 @@
   <footer class="h-footer">
     <div class="container h-footer__grid">
       <div class="h-footer__brand">
-        <a href="#accueil" class="nav__brand"><span class="logo">L<img src="assets/logo-infinity.svg" alt="OO" class="logo__inf" width="124" height="70">PACE</span></a>
+        <a href="#accueil" class="nav__brand"><span class="logo"><img class="logo__img logo__img--on-dark" src="assets/loopace-logo-clair.png" alt="Loopace" width="502" height="104"><img class="logo__img logo__img--on-light" src="assets/loopace-logo-sombre.png" alt="" width="502" height="104"></span></a>
         <p>Prépare ta course au mètre près.</p>
       </div>
       <nav class="h-footer__links" aria-label="Outils">
         <strong>Outils</strong>
         <a href="parcours.html">Tracer un parcours</a>
+        <a href="seance.html">Séance → boucle</a>
         <a href="allure.html">Calculateur d'allure</a>
         <a href="allure.html#routeSection">Bracelet d'allure</a>
         <a href="triathlon.html">Planificateur triathlon (bientôt)</a>
       </nav>
       <div class="h-footer__links">
         <strong>Contact</strong>
-        <a href="mailto:contact@loopace.app">contact@loopace.app</a>
+        <a href="mailto:rotiby@outlook.fr">rotiby@outlook.fr</a>
         <span>Une idée, un bug ? Écris-nous.</span>
       </div>
     </div>
@@ -258,6 +280,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=93"></script>
+  <script src="script.js?v=130"></script>
 </body>
 </html>

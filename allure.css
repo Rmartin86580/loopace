@@ -71,7 +71,7 @@
 .field__input:focus-within { border-color: var(--pink); }
 .field__input input,
 .field__input select {
-  flex: 1; min-width: 0;
+  flex: 1; min-width: 0; width: 0; /* width 0 : le champ ne force plus la largeur de la carte sur téléphone */
   padding: 14px 16px;
   background: none; border: 0; outline: 0;
   color: var(--text);
@@ -153,8 +153,12 @@ tr.is-finish td { color: var(--pink); font-weight: 700; border-bottom: 0; }
   .table-wrap > table { position: static; }
 }
 @media (max-width: 480px) {
-  .seg--small { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; }
-  .rp-inputs .seg--small { grid-template-columns: repeat(2, 1fr); } /* « un temps » / « une allure » */
+  .seg--small { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; }
+  .rp-inputs .seg--small { grid-template-columns: repeat(2, minmax(0, 1fr)); } /* « un temps » / « une allure » */
+  .seg--small button { padding: .45em .4em; }
+  /* Course / Natation / Vélo : icône au-dessus du mot, pour tenir sur un téléphone */
+  .seg--sport { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .seg--sport button { flex-direction: column; gap: 4px; padding: .6em .3em; }
 }
 
 /* ----- Prédiction sur un parcours ----- */
@@ -213,7 +217,7 @@ td.grade.down { color: #7dd3c0; }
   display: grid; place-items: center;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: rgba(11, 11, 12, .7);
+  background: rgba(21, 41, 31, .7);
   color: var(--text);
   cursor: pointer;
 }
@@ -248,7 +252,7 @@ td.grade.down { color: #7dd3c0; }
 .band-option .btn { border: 0; cursor: pointer; font: 600 .9rem var(--font-body); padding: .7em 1.2em; }
 .band-option .btn--ghost { border: 1px solid var(--line); }
 .band-preview { display: grid; place-items: start center; max-height: 56dvh; overflow: auto; border-radius: 12px; }
-.band-preview--band { width: 120px; background: #e9e4e8; padding: 8px; }
+.band-preview--band { width: 120px; background: #e6ecda; padding: 8px; }
 .band-preview--wall { width: 150px; }
 .band-canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); }
 

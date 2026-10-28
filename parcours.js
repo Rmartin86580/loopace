@@ -60,7 +60,7 @@ const baseLayers = {
     maxZoom: 19, attribution: "Imagerie &copy; Esri",
   }),
 };
-baseLayers.Sombre.addTo(map);
+themedBaseLayer(map, baseLayers);
 L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
 
 const routeGlow = L.polyline([], { color: ACCENT, weight: 12, opacity: 0.25, interactive: false }).addTo(map);

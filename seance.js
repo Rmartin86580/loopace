@@ -862,7 +862,7 @@ const baseLayers = {
   Plan: L.tileLayer(streetUrl, { maxZoom: 19, subdomains: "abc", attribution: OSM }),
   Satellite: L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Imagerie &copy; Esri" }),
 };
-baseLayers.Sombre.addTo(map);
+themedBaseLayer(map, baseLayers);
 L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
 map.attributionControl.addAttribution('Itinéraires <a href="https://brouter.de/">BRouter</a>');
 

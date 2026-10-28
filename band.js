@@ -7,45 +7,31 @@
      { section: "VÉLO" }                      ← un intertitre (triathlon)
    ] }
    ========================================================= */
-const PINK = ACCENT;
+const PINK = "#B7E532";  // citron Loopace (sur fond sombre)
+const INK = "#4d7c0f";   // citron assombri, pour le texte sur le papier blanc
 const BAND_DPI = 300;
 const MM = BAND_DPI / 25.4; // pixels par millimètre à 300 dpi
 const BAND_WIDTH_MM = 35;
 
-// Logo Loopace : « L » + boucle infinie (image) + « PACE », comme sur le site
-// SVG intégré : fonctionne aussi en file://
-let bandInf = null;
-const bandLogoReady = svgImage(LOGO_INFINITY_SVG).then((img) => (bandInf = img));
+// Logo Loopace (version texte clair : toujours posé sur un bandeau vert sombre)
+let bandLogo = null;
+const bandLogoReady = dataImage(LOGO_ON_DARK).then((img) => (bandLogo = img));
 
-function logoParts() {
-  const name = BRAND.toUpperCase();
-  const i = name.indexOf("OO");
-  return bandInf && i >= 0 ? [name.slice(0, i), name.slice(i + 2)] : null;
-}
-// Dessine le logo centré sur cx ; baseline = ligne de base des lettres ; fs = taille des lettres
-function drawLogo(ctx, cx, baseline, fs, color = "#ffffff") {
-  ctx.save();
-  ctx.font = `italic 900 ${fs}px "Exo 2"`;
-  ctx.fillStyle = color;
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  const parts = logoParts();
-  if (!parts) {
+// Dessine le logo centré sur cx ; baseline = bas des lettres ; fs = hauteur des lettres
+function drawLogo(ctx, cx, baseline, fs) {
+  if (!bandLogo) {
+    ctx.save();
+    ctx.font = `800 ${fs}px Syne`;
+    ctx.fillStyle = "#F7FAEF";
     ctx.textAlign = "center";
-    ctx.fillText(BRAND.toUpperCase(), cx, baseline);
-  } else {
-    const ih = fs * 1.2;
-    const iw = ih * (bandInf.width / bandInf.height);
-    const gap = fs * 0.03;
-    const w = ctx.measureText(parts[0]).width + gap + iw + ctx.measureText(parts[1]).width;
-    let x = cx - w / 2;
-    ctx.fillText(parts[0], x, baseline);
-    x += ctx.measureText(parts[0]).width + gap;
-    ctx.drawImage(bandInf, x, baseline - fs * 0.36 - ih / 2, iw, ih); // centrée sur les majuscules
-    x += iw;
-    ctx.fillText(parts[1], x, baseline);
+    ctx.textBaseline = "alphabetic";
+    ctx.fillText(BRAND, cx, baseline);
+    ctx.restore();
+    return;
   }
-  ctx.restore();
+  const h = fs * 1.3; // l'image comprend la jambe du « p »
+  const w = h * (bandLogo.width / bandLogo.height);
+  ctx.drawImage(bandLogo, cx - w / 2, baseline - fs * 1.05, w, h);
 }
 
 const gradeMark = (g) => (g >= 3 ? "▲" : g <= -3 ? "▼" : "");
@@ -78,7 +64,7 @@ function drawBand(plan) {
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, W, H);
   // Bandeau du haut
-  ctx.fillStyle = "#0b0b0c";
+  ctx.fillStyle = "#15291F";
   ctx.fillRect(0, 0, W, headH);
   ctx.fillStyle = PINK;
   ctx.fillRect(0, headH - 1.2 * MM, W, 1.2 * MM);
@@ -107,7 +93,7 @@ function drawBand(plan) {
     // En-tête des colonnes
     let y = headH;
     ctx.font = `700 ${2.3 * MM}px Inter`;
-    ctx.fillStyle = "#6b6470";
+    ctx.fillStyle = "#5b6b60";
     ctx.textBaseline = "middle";
     ctx.textAlign = "left";
     ctx.fillText(plan.labelHead || "KM", x0 + pad, y + rowH / 2);
@@ -117,7 +103,7 @@ function drawBand(plan) {
     y += rowH;
     slice.forEach((s, i) => {
       if (s.section) {
-        ctx.fillStyle = "#0b0b0c";
+        ctx.fillStyle = "#15291F";
         ctx.fillRect(x0, y, colW, rowH);
         ctx.textAlign = "left";
         ctx.font = `800 ${2.5 * MM}px Inter`;
@@ -127,13 +113,13 @@ function drawBand(plan) {
         return;
       }
       if (i % 2 === 0) {
-        ctx.fillStyle = "#f4eef3";
+        ctx.fillStyle = "#eef3e2";
         ctx.fillRect(x0, y, colW, rowH);
       }
       const color = gradeColor(s.grade, true);
       ctx.textAlign = "left";
       ctx.font = `700 ${3 * MM}px Inter`;
-      ctx.fillStyle = s.finish ? PINK : "#0b0b0c";
+      ctx.fillStyle = s.finish ? INK : "#15291F";
       ctx.fillText(s.label, x0 + pad, y + rowH / 2);
       const mark = gradeMark(s.grade);
       if (mark) {
@@ -143,23 +129,23 @@ function drawBand(plan) {
       }
       ctx.textAlign = "right";
       ctx.font = `500 ${2.6 * MM}px Inter`;
-      ctx.fillStyle = color || "#4a444f";
+      ctx.fillStyle = color || "#4a5a50";
       ctx.fillText(s.paceTxt, x0 + paceX, y + rowH / 2);
       // Passage : police réduite si le temps dépasse l'heure (h:mm:ss)
       ctx.font = `800 ${(s.cum >= 3600 ? 2.9 : 3.3) * MM}px Inter`;
-      ctx.fillStyle = s.finish ? PINK : "#0b0b0c";
+      ctx.fillStyle = s.finish ? INK : "#15291F";
       ctx.fillText(fmtTime(s.cum), x0 + colW - pad, y + rowH / 2);
       y += rowH;
     });
     if (col > 0) {
-      ctx.fillStyle = "#d9cfd8";
+      ctx.fillStyle = "#d5ddc8";
       ctx.fillRect(x0, headH, 1, H - headH - footH);
     }
   }
   // Pied
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillStyle = "#0b0b0c";
+  ctx.fillStyle = "#15291F";
   ctx.fillRect(0, H - footH, W, footH);
   drawLogo(ctx, W / 2, H - footH / 2 + 3.2 * MM * 0.36, 3.2 * MM);
   // Trait de découpe
@@ -179,7 +165,7 @@ function drawWallpaper(plan) {
   c.height = H;
   const ctx = c.getContext("2d");
   // Fond noir avec halo rose
-  ctx.fillStyle = "#0b0b0c";
+  ctx.fillStyle = "#15291F";
   ctx.fillRect(0, 0, W, H);
   let g = ctx.createRadialGradient(W * 0.8, H * 0.1, 0, W * 0.8, H * 0.1, W);
   g.addColorStop(0, accentRgba(0.35));

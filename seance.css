@@ -1,7 +1,6 @@
 /* =========================================================
    SÉANCE → BOUCLE (complète styles.css + allure.css)
    ========================================================= */
-:root { --se-warm: #8f7fa8; } /* échauffement : violet grisé, entre « facile » et le fond */
 
 .se-grid {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start;
@@ -90,11 +89,11 @@
 .se-search svg, .se-icon-btn svg { width: 20px; height: 20px; }
 
 .se-map { position: relative; height: 460px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
-#map { position: absolute; inset: 0; background: #1a1a1d; }
+#map { position: absolute; inset: 0; background: var(--black-3); }
 .se-map__hint {
   position: absolute; z-index: 500; top: 12px; left: 50%; transform: translateX(-50%);
   padding: 8px 14px; border-radius: 999px; white-space: nowrap;
-  background: rgba(11, 11, 12, .85); border: 1px solid rgba(var(--accent-rgb), .5);
+  background: rgba(21, 41, 31, .85); border: 1px solid rgba(var(--accent-rgb), .5);
   font-size: .82rem; pointer-events: none;
 }
 
@@ -149,7 +148,7 @@
 .leaflet-bar a:hover { background: var(--black-3) !important; color: var(--pink) !important; }
 .leaflet-control-layers-expanded { padding: 10px 14px; }
 .leaflet-control-layers input { accent-color: var(--pink); }
-.leaflet-control-attribution { background: rgba(11, 11, 12, .7) !important; color: var(--muted) !important; font-size: .65rem; }
+.leaflet-control-attribution { background: rgba(21, 41, 31, .7) !important; color: var(--muted) !important; font-size: .65rem; }
 .leaflet-control-attribution a { color: var(--muted) !important; }
 .leaflet-tooltip { background: var(--black-2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; box-shadow: none; }
 .leaflet-tooltip-top::before { border-top-color: var(--black-2); }
