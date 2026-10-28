@@ -15,7 +15,7 @@
   --pink: #4d7c0f;                 /* citron assombri : lisible en texte sur fond clair */
   --lilac: #1f8a4c;
   --grad: linear-gradient(135deg, #c6ee4c 0%, #a3d629 100%);  /* boutons : citron, texte vert sombre */
-  --grad-text: linear-gradient(135deg, #5a8f0e 0%, #2f7a3a 100%);
+  --grad-text: linear-gradient(var(--pink), var(--pink)); /* texte en couleur unie (pas de dégradé) */
   --accent-rgb: 77, 124, 15;
   --accent2-rgb: 31, 138, 76;
   --on-accent: #15291F;
@@ -69,12 +69,6 @@
 [data-theme="light"] .tri-block { --c-t: #9aa69c; }
 
 /* ----- Accueil ----- */
-[data-theme="light"] .h-hero__bg {
-  background:
-    radial-gradient(circle at 75% 40%, rgba(var(--accent-rgb), .18), transparent 45%),
-    radial-gradient(circle at 10% 90%, rgba(var(--accent2-rgb), .1), transparent 40%),
-    linear-gradient(90deg, var(--black) 20%, rgba(247, 250, 239, .6) 60%, rgba(247, 250, 239, .85));
-}
 [data-theme="light"] .h-mock__window { border-color: var(--line); box-shadow: 0 40px 80px -20px rgba(21, 41, 31, .25), 0 0 0 1px rgba(var(--accent-rgb), .08); }
 [data-theme="light"] .h-mock__bar span { background: #cfd8c4; }
 [data-theme="light"] .h-mock__map { background: radial-gradient(circle at 60% 40%, rgba(var(--accent-rgb), .08), transparent 60%), #e9efdd; }
@@ -87,11 +81,6 @@
 [data-theme="light"] .h-band,
 [data-theme="light"] .h-mini-band { border: 1px solid var(--line); }
 [data-theme="light"] .h-mini-video { background: linear-gradient(160deg, rgba(var(--accent-rgb), .55), rgba(21, 41, 31, .85)); border-color: var(--line); }
-[data-theme="light"] .h-final {
-  background:
-    radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), .16), transparent 60%),
-    #ffffff;
-}
 
 /* ----- Ombres trop lourdes sur fond clair ----- */
 [data-theme="light"] .band-canvas { box-shadow: 0 8px 24px rgba(21, 41, 31, .18); }

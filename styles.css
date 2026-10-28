@@ -124,7 +124,7 @@ p { margin: 0 0 1em; color: var(--muted); }
 
 /* ===== Sections ===== */
 .section { padding: clamp(80px, 12vw, 140px) 0; position: relative; }
-.section--alt { background: var(--black-2); border-block: 1px solid var(--line); }
+.section--alt { border-block: 1px solid var(--line); } /* même fond que le reste de la page */
 
 
 /* ===== Footer ===== */

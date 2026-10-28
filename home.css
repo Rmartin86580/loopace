@@ -21,11 +21,7 @@
 .h-hero__bg {
   position: absolute; inset: -5%;
   z-index: -1;
-  background:
-    radial-gradient(circle at 75% 40%, rgba(var(--accent-rgb), .28), transparent 45%),
-    radial-gradient(circle at 10% 90%, rgba(var(--accent2-rgb), .14), transparent 40%),
-    linear-gradient(90deg, var(--black) 20%, rgba(21, 41, 31, .6) 60%, rgba(21, 41, 31, .85));
-  animation: drift 30s ease-in-out infinite alternate;
+  background: none; /* fond uni : plus de lueur derrière l'accueil */
 }
 .h-hero__grid {
   display: grid;
@@ -283,17 +279,15 @@
   padding: clamp(40px, 7vw, 80px) 24px;
   border-radius: 28px;
   border: 1px solid var(--line);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(var(--accent-rgb), .3), transparent 60%),
-    linear-gradient(rgba(21, 41, 31, .7), rgba(21, 41, 31, .9));
+  background: none;
 }
-.h-final img { width: 64px; height: auto; margin-bottom: 14px; filter: drop-shadow(0 10px 30px rgba(var(--accent-rgb), .5)); animation: float 6s ease-in-out infinite; }
+.h-final img { width: 64px; height: auto; margin-bottom: 14px; animation: float 6s ease-in-out infinite; }
 .h-final h2 { font-size: clamp(2rem, 5vw, 3.2rem); }
 .h-final p { margin-bottom: 1.6rem; }
 .h-final .h-hero__actions { justify-content: center; }
 
 /* ===== Pied de page ===== */
-.h-footer { border-top: 1px solid var(--line); background: var(--black-2); padding: 56px 0 24px; font-size: .9rem; }
+.h-footer { border-top: 1px solid var(--line); background: var(--black); padding: 56px 0 24px; font-size: .9rem; }
 .h-footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 32px; }
 .h-footer__brand p { margin: 12px 0 0; }
 .h-footer__brand .nav__brand { display: inline-flex; } /* logo + slogan calés à gauche */

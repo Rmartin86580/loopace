@@ -14,7 +14,7 @@
   --pink: #B7E532;                 /* citron vert : accent principal */
   --lilac: #4cb873;                /* vert moyen : second accent (efforts faciles, vélo…) */
   --grad: linear-gradient(135deg, #c6ee4c 0%, #a3d629 100%);
-  --grad-text: linear-gradient(135deg, #c6ee4c 0%, #9fdc3a 100%);
+  --grad-text: linear-gradient(var(--pink), var(--pink)); /* texte en couleur unie (pas de dégradé) */
   --accent-rgb: 183, 229, 50;
   --accent2-rgb: 76, 184, 115;
   --on-accent: #15291F;            /* texte vert sombre sur le citron */

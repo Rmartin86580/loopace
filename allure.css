@@ -11,7 +11,7 @@
 }
 .tool-hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: radial-gradient(ellipse at 50% 0%, rgba(var(--accent-rgb), .22), transparent 60%);
+  background: none; /* fond uni, sans lueur */
 }
 .tool-hero h1 { font-size: clamp(2.4rem, 7vw, 4.2rem); letter-spacing: -0.02em; }
 .tool-hero p:last-child { max-width: 520px; margin: 0 auto; }
