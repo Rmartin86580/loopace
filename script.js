@@ -59,6 +59,8 @@ function accentRgba(alpha, hex = ACCENT) {
   links.append(btn);
 })();
 const isLightTheme = () => document.documentElement.dataset.theme === "light";
+// Couleur d'une variable du thème au moment de l'appel (elle change avec le bouton clair/sombre)
+const cssVar = (name, fallback = ACCENT) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
 // Fond de carte qui suit le thème : « Sombre » ou « Plan » (sauf si on a choisi Sentiers ou Satellite)
 function themedBaseLayer(map, layers) {

@@ -20,6 +20,11 @@
   --accent2-rgb: 31, 138, 76;
   --on-accent: #15291F;
   --se-warm: #97a99b;
+  /* Tracés sur la carte (fond « Plan ») : vert foncé, sinon on ne les voit pas */
+  --map-route: #15291F;
+  --map-hard: #15291F;
+  --map-easy: #4d7c0f;
+  --map-warm: #7d8f83;
   --up: #c2410c;                   /* montée */
   --down: #0f766e;                 /* descente */
   --error: #c62828;

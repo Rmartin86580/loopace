@@ -19,4 +19,9 @@
   --accent2-rgb: 76, 184, 115;
   --on-accent: #15291F;            /* texte vert sombre sur le citron */
   --se-warm: #6f8a78;              /* échauffement : vert grisé */
+  /* Tracés sur la carte (fond « Sombre ») : vert clair */
+  --map-route: #B7E532;
+  --map-hard: #B7E532;
+  --map-easy: #4cb873;
+  --map-warm: #8fa596;
 }

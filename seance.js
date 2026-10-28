@@ -1121,9 +1121,10 @@ async function makeLoop() {
   }
 }
 $("loopBtn").addEventListener("click", makeLoop);
+document.addEventListener("loopace:theme", () => drawLoop()); // couleurs du tracé selon le thème
 
 // Tracé coloré : chaque étape de la séance à l'endroit où tu seras
-const KIND_COLORS = () => ({ warm: getCss("--se-warm"), easy: getCss("--lilac"), hard: getCss("--pink") });
+const KIND_COLORS = () => ({ warm: getCss("--map-warm"), easy: getCss("--map-easy"), hard: getCss("--map-hard") });
 const getCss = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim() || "#999";
 
 function drawLoop(fit = false) {

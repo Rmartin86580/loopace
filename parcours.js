@@ -63,38 +63,20 @@ const baseLayers = {
 themedBaseLayer(map, baseLayers);
 L.control.layers(baseLayers, null, { position: "topright" }).addTo(map);
 
-const routeGlow = L.polyline([], { color: ACCENT, weight: 12, opacity: 0.25, interactive: false }).addTo(map);
-const routeLine = L.polyline([], { color: ACCENT, weight: 4, opacity: 1, interactive: false }).addTo(map);
+const routeGlow = L.polyline([], { color: cssVar("--map-route"), weight: 12, opacity: 0.25, interactive: false }).addTo(map);
+const routeLine = L.polyline([], { color: cssVar("--map-route"), weight: 4, opacity: 1, interactive: false }).addTo(map);
 
-// Tracé en dégradé rose → violet (du départ vers l'arrivée, sur la largeur du tracé)
+// Couleur du tracé : vert clair en thème sombre, vert foncé en thème clair (--map-route)
 function applyRouteGradient() {
-  const path = routeLine.getElement();
-  const svg = path?.ownerSVGElement;
-  if (!svg || ACCENT2.toLowerCase() === ACCENT.toLowerCase()) return;
-  if (!svg.querySelector("#routeGrad")) {
-    const ns = "http://www.w3.org/2000/svg";
-    const defs = svg.querySelector("defs") || svg.insertBefore(document.createElementNS(ns, "defs"), svg.firstChild);
-    const grad = document.createElementNS(ns, "linearGradient");
-    grad.id = "routeGrad";
-    grad.innerHTML = `<stop offset="0" stop-color="${ACCENT}"/><stop offset="1" stop-color="${ACCENT2}"/>`;
-    defs.append(grad);
-  }
-  // Sens du dégradé : du départ vers l'arrivée
-  const pts = routeLine.getLatLngs();
-  if (pts.length > 1) {
-    const a = map.latLngToLayerPoint(pts[0]);
-    const b = map.latLngToLayerPoint(pts[pts.length - 1]);
-    const loop = a.distanceTo(b) < 30; // boucle : départ ≈ arrivée, dégradé de gauche à droite
-    const g = svg.querySelector("#routeGrad");
-    g.setAttribute("x1", loop || a.x <= b.x ? "0" : "1");
-    g.setAttribute("x2", loop || a.x <= b.x ? "1" : "0");
-  }
-  path.setAttribute("stroke", "url(#routeGrad)");
+  const c = cssVar("--map-route");
+  routeLine.setStyle({ color: c });
+  routeGlow.setStyle({ color: c });
+  hoverDot.setStyle({ fillColor: c });
 }
-map.on("zoomend moveend", applyRouteGradient);
+document.addEventListener("loopace:theme", applyRouteGradient);
 const kmLayer = L.layerGroup().addTo(map);
 const markerLayer = L.layerGroup().addTo(map);
-const hoverDot = L.circleMarker([0, 0], { radius: 7, color: "#fff", weight: 2, fillColor: ACCENT, fillOpacity: 1, interactive: false });
+const hoverDot = L.circleMarker([0, 0], { radius: 7, color: "#fff", weight: 2, fillColor: cssVar("--map-route"), fillOpacity: 1, interactive: false });
 
 fitLayout();
 window.addEventListener("resize", fitLayout);
