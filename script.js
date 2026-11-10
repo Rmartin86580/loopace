@@ -76,6 +76,83 @@ function themedBaseLayer(map, layers) {
   });
 }
 
+// Fenêtre d'import commune (parcours, séance) : glisser-déposer ou parcourir, avec les explications du format.
+// onFiles(files) lit les fichiers ; s'il lève une erreur, elle s'affiche dans la fenêtre, sinon la fenêtre se ferme.
+function openImportDialog({ title, intro = "", formats, accept, multiple = false, help = [], onFiles }) {
+  let dlg = document.getElementById("importDialog");
+  if (!dlg) {
+    dlg = document.createElement("dialog");
+    dlg.id = "importDialog";
+    dlg.className = "import-dialog";
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); }); // clic à côté : fermer
+    document.body.append(dlg);
+  }
+  dlg.innerHTML = `
+    <div class="import-dialog__body">
+      <div class="import-dialog__head">
+        <h2>${title}</h2>
+        <button type="button" class="import-dialog__close" aria-label="Fermer">✕</button>
+      </div>
+      ${intro ? `<p class="import-dialog__intro">${intro}</p>` : ""}
+      <label class="import-drop">
+        <svg class="import-drop__ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        <strong>Glisse ${multiple ? "tes fichiers" : "ton fichier"} ici</strong>
+        <span>ou</span>
+        <span class="btn import-drop__btn">Parcourir mes fichiers</span>
+        <small>${formats}</small>
+        <input type="file" accept="${accept}"${multiple ? " multiple" : ""} hidden>
+      </label>
+      ${help.length ? `<ul class="import-dialog__help">${help.map((h) => `<li>${h}</li>`).join("")}</ul>` : ""}
+      <p class="import-dialog__msg" role="status" hidden></p>
+    </div>`;
+  const body = dlg.querySelector(".import-dialog__body");
+  const drop = dlg.querySelector(".import-drop");
+  const input = drop.querySelector("input");
+  const msg = dlg.querySelector(".import-dialog__msg");
+  dlg.querySelector(".import-dialog__close").addEventListener("click", () => dlg.close());
+  async function handle(list) {
+    const files = [...list];
+    if (!files.length) return;
+    msg.hidden = false;
+    msg.classList.remove("is-error");
+    msg.textContent = files.length > 1 ? `Lecture de ${files.length} fichiers…` : `Lecture de ${files[0].name}…`;
+    drop.classList.add("is-busy");
+    try {
+      await onFiles(multiple ? files : files.slice(0, 1));
+      dlg.close();
+    } catch (e) {
+      msg.textContent = e.message || "Impossible de lire ce fichier.";
+      msg.classList.add("is-error");
+    } finally {
+      drop.classList.remove("is-busy");
+    }
+  }
+  input.addEventListener("change", () => {
+    handle(input.files);
+    input.value = ""; // permet de reprendre le même fichier
+  });
+  // Toute la fenêtre accepte le dépôt
+  body.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    drop.classList.add("is-over");
+  });
+  body.addEventListener("dragleave", (e) => { if (!body.contains(e.relatedTarget)) drop.classList.remove("is-over"); });
+  body.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.classList.remove("is-over");
+    handle(e.dataTransfer.files);
+  });
+  dlg.showModal();
+}
+
+// Textes de la fenêtre d'import d'un parcours (Parcours, Allure, Triathlon)
+const ROUTE_IMPORT_TEXT = {
+  title: "Importer un parcours",
+  intro: "Le parcours officiel de ta course (souvent donné par l'organisateur) ou une sortie enregistrée par ta montre.",
+  formats: "Fichier .gpx, .tcx ou .fit",
+  accept: ".gpx,.tcx,.fit",
+};
+
 // Apparition des éléments au défilement
 const observer = new IntersectionObserver(
   (entries) => entries.forEach((e) => {

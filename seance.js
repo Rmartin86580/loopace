@@ -473,6 +473,8 @@ function measure(steps) {
     const pct = e.pct ? (e.pct[0] + e.pct[1]) / 2 : 0;
     const kind = e.walk || e.static ? "easy"
       : WARM_WORDS.test(label) ? "warm"
+      // Le nom de l'étape (« Retour au calme », « Récup ») compte plus que sa cible (« 60 % Threshold Pace »)
+      : EASY_WORDS.test(s.name) && !HARD_WORDS.test(s.name) ? "easy"
       : EASY_WORDS.test(label) && !HARD_WORDS.test(label) ? "easy"
       : HARD_WORDS.test(label) || pct >= 0.82 || (mid && slowest - fastest > 20 && mid <= fastest + 0.35 * (slowest - fastest)) ? "hard"
       : "easy";
@@ -504,6 +506,8 @@ const sumKnown = (list, k) => list.reduce((a, s) => a + (s[k] ?? 0), 0);
 /* ---------- Affichage de la séance ---------- */
 let workout = null; // { steps (déroulées), sec, dist, distMin, distMax }
 let measured = new Map(); // effort → étape mesurée (pour l'affichage de l'arbre)
+let workoutTree = []; // séance lue, répétitions comprises (pour l'export vers la montre)
+let importedName = ""; // nom de la séance importée, tant qu'on ne la modifie pas
 
 function stepLine(s) {
   const e = s.effort;
@@ -537,6 +541,7 @@ function renderTree(items) {
 
 function readWorkout() {
   const tree = parseWorkout($("workoutText").value);
+  workoutTree = tree;
   const steps = withPlacement(measure(flatten(tree)));
   measured = new Map(steps.map((s) => [s.effort, s]));
   if (!steps.length) {
@@ -546,8 +551,10 @@ function readWorkout() {
     $("workoutTotals").innerHTML = `<p class="card__hint">Colle ta séance ci-dessus, par exemple « 21 min @ 06:19-07:22 min/km » ou « 20' + 10x400 r=1' + 10' ».</p>`;
     $("loopKm").value = "";
     updateLoopButton();
+    $("fitWorkoutBtn").disabled = true;
     return;
   }
+  $("fitWorkoutBtn").disabled = false;
   const noTime = steps.filter((x) => x.sec == null);
   const noDist = steps.filter((x) => x.dist == null);
   workout = {
@@ -793,32 +800,211 @@ function fitMsg(text, error = false) {
   $("fitMsg").classList.toggle("is-error", error);
 }
 
-async function importFit(file) {
-  if (!file) return;
-  if (!/\.fit$/i.test(file.name)) return fitMsg("Choisis un fichier .fit (séance exportée depuis ta montre ou ton appli).", true);
-  try {
-    const fit = readFit(await file.arrayBuffer());
-    const r = fitToText(fit);
-    if (r.sport === 5) return fitMsg("C'est une séance de natation : pas de boucle à tracer pour celle-ci.", true);
-    // Sport du fichier : vélo (VTT 8, gravel 46, sinon route), sinon à pied
-    if (r.sport === 2) setSport(r.subSport === 8 ? "mtb" : r.subSport === 46 ? "gravel" : "road");
-    else if ([1, 11, 17].includes(r.sport)) setSport("run");
-    $("workoutText").value = r.text;
-    loopKmTouched = false;
-    readWorkout();
-    save();
-    const other = r.sport != null && ![0, 1, 2, 11, 17].includes(r.sport) ? ` Séance de ${FIT_SPORTS[r.sport] || "un autre sport"} : vérifie le sport choisi pour la boucle.` : "";
-    fitMsg(`${r.name ? `« ${r.name} »` : "Séance"} importée depuis ${file.name} (${SPORTS[sport].name}).${r.notes.length ? ` À savoir : ${r.notes.join(" ; ")}.` : ""}${other}`);
-  } catch (e) {
-    fitMsg(e.message && !/offset|bounds|range/i.test(e.message) ? e.message : "Impossible de lire ce fichier .fit.", true);
-  }
+/* ---------- Autres formats de séance ----------
+   .zwo (Zwift, exporté par TrainingPeaks, intervals.icu…), .erg / .mrc (ergomètre),
+   .tcx (séance Garmin Training Center). Comme le .fit, chaque séance est réécrite en texte. */
+const distText = (m) => (m >= 1000 ? `${String(Math.round(m / 10) / 100)} km` : `${Math.round(m)} m`);
+const kid = (el, name) => el && [...el.children].find((c) => c.localName === name);
+const kidText = (el, name) => kid(el, name)?.textContent.trim() || "";
+function parseXml(text, ext) {
+  const doc = new DOMParser().parseFromString(text, "application/xml");
+  if (doc.querySelector("parsererror")) throw new Error(`Fichier ${ext} illisible.`);
+  return doc;
+}
+// Ajoute une étape au texte : nom, puis « durée @ cible » (une ligne vide avant, comme pour le .fit)
+function pushStep(lines, title, dur, target, ind = "") {
+  if (lines.length && lines[lines.length - 1] !== "") lines.push("");
+  lines.push(`${ind}${title}`);
+  lines.push(`${ind}${dur}${target ? ` @ ${target}` : ""}`);
 }
 
-$("fitInput").addEventListener("change", (e) => {
-  importFit(e.target.files[0]);
-  e.target.value = ""; // permet de réimporter le même fichier
-});
-// Glisser-déposer un .fit sur la zone de texte
+function zwoToText(text) {
+  const doc = parseXml(text, ".zwo");
+  const run = (doc.querySelector("sportType")?.textContent || "").trim().toLowerCase() === "run";
+  const byDist = (doc.querySelector("durationType")?.textContent || "").trim().toLowerCase() === "distance";
+  const unit = run ? "% Threshold Pace" : "% FTP";
+  const pct = (a, b = a) => {
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return "";
+    const lo = Math.round(Math.min(a, b) * 100);
+    const hi = Math.round(Math.max(a, b) * 100);
+    return lo === hi ? `${lo}${unit}` : `${lo}-${hi}${unit}`;
+  };
+  const dur = (v) => (byDist ? distText(Number(v)) : fitTime(Math.round(Number(v))));
+  const lines = [];
+  const nodes = [...(doc.querySelector("workout")?.children || [])];
+  for (const n of nodes) {
+    const g = (k) => Number(n.getAttribute(k) ?? n.getAttribute(k.toLowerCase()));
+    const t = n.localName.toLowerCase();
+    if (t === "warmup") pushStep(lines, "Échauffement", dur(g("Duration")), pct(g("PowerLow"), g("PowerHigh")));
+    else if (t === "cooldown") pushStep(lines, "Retour au calme", dur(g("Duration")), pct(g("PowerLow"), g("PowerHigh")));
+    else if (t === "ramp") pushStep(lines, "Progressif", dur(g("Duration")), pct(g("PowerLow"), g("PowerHigh")));
+    else if (t === "steadystate") pushStep(lines, g("Power") >= 0.85 ? "Effort" : g("Power") < 0.6 ? "Récupération" : "Endurance", dur(g("Duration")), pct(g("Power")));
+    else if (t === "freeride") pushStep(lines, "Libre", dur(g("Duration")), "");
+    else if (t === "maxeffort") pushStep(lines, "Effort maximal", dur(g("Duration")), "");
+    else if (t === "intervalst") {
+      if (lines.length) lines.push("");
+      lines.push(`Répéter ${g("Repeat") || 1} fois`);
+      pushStep(lines, "Effort", dur(g("OnDuration")), pct(g("OnPower")), "  ");
+      pushStep(lines, "Récupération", dur(g("OffDuration")), pct(g("OffPower")), "  ");
+    }
+  }
+  if (!lines.length) throw new Error("Aucune étape de séance trouvée dans ce fichier .zwo.");
+  return { text: lines.join("\n"), name: doc.querySelector("name")?.textContent.trim() || "", sport: run ? "run" : "road", notes: [] };
+}
+
+function ergToText(text, ext) {
+  const header = text.split(/\[END COURSE HEADER\]/i)[0] || "";
+  const data = text.split(/\[COURSE DATA\]/i)[1]?.split(/\[END COURSE DATA\]/i)[0];
+  const pts = (data || "").trim().split(/\r?\n/).map((l) => l.trim().split(/\s+/).map(Number)).filter((p) => p.length >= 2 && p.every(Number.isFinite));
+  if (pts.length < 2) throw new Error(`Aucune étape de séance trouvée dans ce fichier ${ext}.`);
+  const pctMode = /PERCENT/i.test(header) || ext === ".mrc";
+  // Paliers : d'un point au suivant (minutes, puissance) ; deux paliers identiques à la suite n'en font qu'un
+  const segs = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [t0, v0] = pts[i];
+    const [t1, v1] = pts[i + 1];
+    if (t1 <= t0) continue;
+    const last = segs[segs.length - 1];
+    if (last && last.lo === v0 && last.hi === v1 && v0 === v1) last.sec += (t1 - t0) * 60;
+    else segs.push({ sec: (t1 - t0) * 60, lo: v0, hi: v1 });
+  }
+  const ref = pctMode ? 100 : Math.max(...segs.map((x) => Math.max(x.lo, x.hi))); // en watts : relatif au palier le plus dur
+  const lines = [];
+  segs.forEach((x, i) => {
+    const mid = ((x.lo + x.hi) / 2) / ref;
+    const title = i === 0 && segs.length > 2 && mid < 0.75 ? "Échauffement"
+      : i === segs.length - 1 && segs.length > 2 && mid < 0.75 ? "Retour au calme"
+      : mid >= 0.85 ? "Effort" : mid < 0.6 ? "Récupération" : "Endurance";
+    const u = pctMode ? "% FTP" : " W";
+    const lo = Math.round(Math.min(x.lo, x.hi));
+    const hi = Math.round(Math.max(x.lo, x.hi));
+    pushStep(lines, title, fitTime(Math.round(x.sec)), lo === hi ? `${lo}${u}` : `${lo}-${hi}${u}`);
+  });
+  const name = (header.match(/DESCRIPTION\s*=\s*(.+)/i) || header.match(/FILE NAME\s*=\s*(.+)/i) || [])[1]?.trim() || "";
+  return { text: lines.join("\n"), name, sport: "road", notes: [] };
+}
+
+function tcxToText(text) {
+  const doc = parseXml(text, ".tcx");
+  const w = doc.getElementsByTagName("Workout")[0];
+  if (!w) {
+    throw new Error(doc.getElementsByTagName("Activity").length
+      ? "Ce fichier .tcx est une sortie enregistrée, pas une séance à faire."
+      : "Aucune séance trouvée dans ce fichier .tcx.");
+  }
+  const xsi = (el) => el.getAttribute("xsi:type") || el.getAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "type") || "";
+  const bike = /bik/i.test(w.getAttribute("Sport") || "");
+  const lines = [];
+  let free = 0;
+  (function write(list, depth) {
+    const ind = "  ".repeat(depth);
+    for (const st of list) {
+      if (/repeat/i.test(xsi(st))) {
+        if (lines.length) lines.push("");
+        lines.push(`${ind}Répéter ${kidText(st, "Repetitions") || 1} fois`);
+        write([...st.children].filter((c) => c.localName === "Child"), depth + 1);
+        continue;
+      }
+      const d = kid(st, "Duration");
+      const dType = d ? xsi(d) : "";
+      const dur = /time/i.test(dType) ? fitTime(Number(kidText(d, "Seconds")))
+        : /distance/i.test(dType) ? distText(Number(kidText(d, "Meters"))) : null;
+      if (!dur) free++;
+      const tg = kid(st, "Target");
+      const zone = kid(tg, "SpeedZone") || kid(tg, "HeartRateZone");
+      let target = "";
+      if (zone && /custom/i.test(xsi(zone))) {
+        const lo = Number(kidText(zone, "LowInMetersPerSecond"));
+        const hi = Number(kidText(zone, "HighInMetersPerSecond"));
+        if (lo && hi) target = bike ? `${fmtNum(lo * 3.6, 1)}-${fmtNum(hi * 3.6, 1)} km/h` : `${fmtPace(1000 / hi)}-${fmtPace(1000 / lo)} min/km`;
+      } else if (zone && kidText(zone, "Number")) {
+        target = `Z${kidText(zone, "Number")}${kid(tg, "HeartRateZone") ? " HR" : ""}`;
+      }
+      const title = kidText(st, "Name") || (kidText(st, "Intensity") === "Resting" ? "Récupération" : "Course");
+      if (lines.length && lines[lines.length - 1] !== "") lines.push("");
+      lines.push(`${ind}${title}`);
+      lines.push(dur ? `${ind}${dur}${target ? ` @ ${target}` : ""}` : `${ind}jusqu'au bouton Lap`);
+    }
+  })([...w.children].filter((c) => c.localName === "Step"), 0);
+  if (!lines.length) throw new Error("Aucune étape de séance trouvée dans ce fichier .tcx.");
+  const notes = free ? [`${free} étape${free > 1 ? "s" : ""} sans durée fixe : non comptée${free > 1 ? "s" : ""} dans la durée et la distance`] : [];
+  return { text: lines.join("\n"), name: kidText(w, "Name"), sport: bike ? "road" : "run", notes };
+}
+
+const IMPORT_EXT = /\.(fit|zwo|erg|mrc|tcx|txt)$/i;
+// Lit un fichier de séance, quel que soit son format → { text, name, sport, notes }
+async function readSessionFile(file) {
+  const ext = (file.name.match(IMPORT_EXT)?.[0] || "").toLowerCase();
+  if (!ext) throw new Error(`${file.name} : format non reconnu (fichiers acceptés : .fit, .zwo, .tcx, .erg, .mrc, .txt).`);
+  if (ext === ".fit") {
+    const r = fitToText(readFit(await file.arrayBuffer()));
+    if (r.sport === 5) throw new Error("C'est une séance de natation : pas de boucle à tracer pour celle-ci.");
+    // Sport du fichier : vélo (VTT 8, gravel 46, sinon route), sinon à pied
+    const key = r.sport === 2 ? (r.subSport === 8 ? "mtb" : r.subSport === 46 ? "gravel" : "road") : [1, 11, 17].includes(r.sport) ? "run" : null;
+    if (r.sport != null && ![0, 1, 2, 11, 17].includes(r.sport)) r.notes.push(`séance de ${FIT_SPORTS[r.sport] || "un autre sport"} : vérifie le sport choisi pour la boucle`);
+    return { ...r, sport: key };
+  }
+  const text = await file.text();
+  if (ext === ".zwo") return zwoToText(text);
+  if (ext === ".tcx") return tcxToText(text);
+  if (ext === ".erg" || ext === ".mrc") return ergToText(text, ext);
+  return { text: text.trim(), name: file.name.replace(/\.txt$/i, ""), sport: null, notes: [] };
+}
+
+// Met une séance importée dans la zone de texte
+function useImported(r) {
+  if (r.sport) setSport(r.sport);
+  $("workoutText").value = r.text;
+  importedName = r.name || "";
+  loopKmTouched = false;
+  readWorkout();
+  save();
+  fitMsg(`${r.name ? `« ${r.name} »` : "Séance"} importée depuis ${r.file} (${SPORTS[sport].name}).${r.notes.length ? ` À savoir : ${r.notes.join(" ; ")}.` : ""}`);
+  document.querySelectorAll("#importList button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.i === String(r.i))));
+}
+
+// Un ou plusieurs fichiers : avec plusieurs séances, on les liste pour passer de l'une à l'autre
+async function importFiles(files) {
+  files = [...files];
+  if (!files.length) return;
+  const ok = [];
+  const errors = [];
+  for (const file of files) {
+    try {
+      ok.push({ ...(await readSessionFile(file)), file: file.name, i: ok.length });
+    } catch (e) {
+      errors.push(e.message && !/offset|bounds|range/i.test(e.message) ? e.message : `Impossible de lire ${file.name}.`);
+    }
+  }
+  const list = $("importList");
+  list.hidden = ok.length < 2;
+  list.innerHTML = ok.length < 2 ? "" : `<span>${ok.length} séances importées :</span>` + ok.map((r) => `<button type="button" class="se-import" data-i="${r.i}" aria-pressed="false">${esc(r.name || r.file)}</button>`).join("");
+  list.onclick = (e) => {
+    const b = e.target.closest("button[data-i]");
+    if (b) useImported(ok[Number(b.dataset.i)]);
+  };
+  if (ok.length) useImported(ok[0]);
+  if (errors.length) fitMsg((ok.length ? `${$("fitMsg").textContent} ` : "") + errors.join(" "), !ok.length);
+  return { ok: ok.length, errors };
+}
+
+$("sessionImportBtn").addEventListener("click", () => openImportDialog({
+  title: "Importer une séance",
+  intro: "Exporte la séance prévue depuis l'appli de ta montre ou ton suivi d'entraînement (TrainingPeaks, intervals.icu…).",
+  formats: "Fichier .fit, .zwo, .tcx, .erg, .mrc ou .txt · plusieurs à la fois si tu veux",
+  accept: ".fit,.zwo,.tcx,.erg,.mrc,.txt",
+  multiple: true,
+  help: [
+    "Exporte la séance à faire, pas une sortie déjà enregistrée.",
+    "Elle est réécrite en texte : tu peux la relire et la modifier avant de tracer ta boucle.",
+    "Avec plusieurs fichiers, tu passes de l'une à l'autre avec les boutons au-dessus du texte.",
+  ],
+  onFiles: async (files) => {
+    const r = await importFiles(files);
+    if (!r.ok) throw new Error(r.errors.join(" ")); // rien de lisible : on reste dans la fenêtre
+  },
+}));
+// Glisser-déposer un ou plusieurs fichiers sur la zone de texte
 $("workoutText").addEventListener("dragover", (e) => {
   if ([...e.dataTransfer.items].some((i) => i.kind === "file")) {
     e.preventDefault();
@@ -827,15 +1013,55 @@ $("workoutText").addEventListener("dragover", (e) => {
 });
 $("workoutText").addEventListener("dragleave", () => $("workoutText").classList.remove("is-drop"));
 $("workoutText").addEventListener("drop", (e) => {
-  const file = e.dataTransfer.files[0];
   $("workoutText").classList.remove("is-drop");
-  if (!file) return;
+  if (!e.dataTransfer.files.length) return;
   e.preventDefault();
-  importFit(file);
+  importFiles(e.dataTransfer.files);
+});
+
+/* ---------- Envoyer la séance sur la montre (fichier .fit d'entraînement) ----------
+   Les répétitions restent des répétitions ; chaque étape garde sa durée ou sa distance et sa plage d'allure. */
+const COOL_WORDS = /cool|retour|calme|\brac\b/i;
+function fitWorkoutSteps(items, out = [], inRepeat = false) {
+  for (const it of items) {
+    if (it.repeat) {
+      const from = out.length;
+      fitWorkoutSteps(it.children, out, true);
+      if (out.length > from) out.push({ repeatFrom: from, count: it.repeat });
+      continue;
+    }
+    if (!it.effort && !it.open) continue;
+    const e = it.effort;
+    const m = e ? measured.get(e) : null;
+    const label = `${it.name} ${it.zone || ""}`;
+    const pace = e ? stepPace(e) : null; // [rapide, lente] en s/km
+    out.push({
+      name: (m?.title || it.name || "Étape").replace(/^\d+[.)]\s*/, ""),
+      duration: e?.sec != null ? { type: "time", value: e.sec } : e?.dist != null ? { type: "distance", value: e.dist } : { type: "open" },
+      speed: pace ? [1000 / pace[1], 1000 / pace[0]] : null,
+      intensity: !m ? 0
+        : m.kind === "hard" ? 0
+        : m.kind === "warm" ? (COOL_WORDS.test(label) ? 3 : 2)
+        : e.walk || e.static || /\brepos\b|\brest\b/i.test(label) ? 1
+        : COOL_WORDS.test(label) ? 3
+        : inRepeat ? 4 : 0,
+    });
+  }
+  return out;
+}
+
+$("fitWorkoutBtn").addEventListener("click", () => {
+  if (!workout) return;
+  const steps = fitWorkoutSteps(workoutTree);
+  const name = importedName || `Séance ${workout.sec ? fmtDuration(workout.sec) : ""}`.trim();
+  const bike = isBike();
+  downloadFile(fitWorkoutFile({ name, sport: bike ? 2 : 1, subSport: { road: 7, mtb: 8, gravel: 46 }[sport] || 0, steps }), name, "fit");
+  $("fitWorkoutHelp").hidden = false;
 });
 
 let loopKmTouched = false;
 $("workoutText").addEventListener("input", () => {
+  importedName = "";
   readWorkout();
   save();
 });
@@ -1298,6 +1524,7 @@ $("gpxLoopBtn").addEventListener("click", () => {
   a.download = `${name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "boucle"}.gpx`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  status("Fichier GPX téléchargé : importe-le dans l'appli de ta montre (Coros, Garmin, Polar, Suunto, Wahoo…) ou dans Strava.");
 });
 
 /* ---------- Mémorise la séance et le départ (dans ce navigateur) ---------- */

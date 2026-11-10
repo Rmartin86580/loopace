@@ -8,16 +8,28 @@
   <meta name="tdm-reservation" content="1">
   <title>Séance → boucle — Loopace</title>
   <meta name="description" content="Colle ta séance de fractionné : Loopace calcule sa durée et sa distance, puis crée une boucle de la bonne longueur qui revient à ton point de départ. Gratuit.">
+  <!-- Vignette de partage (WhatsApp, Facebook, X, LinkedIn…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Loopace">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Séance → boucle — Loopace">
+  <meta property="og:description" content="Colle ta séance de fractionné : Loopace calcule sa durée et sa distance, puis crée une boucle de la bonne longueur qui revient à ton point de départ. Gratuit.">
+  <meta property="og:url" content="https://rmartin86580.github.io/loopace/seance.html">
+  <meta property="og:image" content="https://rmartin86580.github.io/loopace/assets/og/seance.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Séance → boucle — Loopace">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/loopace-icone-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/loopace-icone-192.png">
   <link rel="apple-touch-icon" href="assets/loopace-icone-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=139">
+  <link rel="stylesheet" href="styles.css?v=152">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="allure.css?v=139">
-  <link rel="stylesheet" href="seance.css?v=130">
+  <link rel="stylesheet" href="seance.css?v=160">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
   <link rel="stylesheet" href="theme-logo.css?v=142">
   <link rel="stylesheet" href="theme-light.css?v=142">
@@ -43,7 +55,7 @@
       <div class="container">
         <p class="eyebrow">Outil</p>
         <h1>Séance <span class="grad">→ boucle</span></h1>
-        <p>Tu as ta séance, il te manque le parcours ? Importe le .fit ou colle le texte, choisis ton point de départ : on te trace la boucle qui va avec.</p>
+        <p>Tu as ta séance, il te manque le parcours ? Importe ta séance (.fit, .zwo, .tcx…) ou colle le texte, choisis ton point de départ : on te trace la boucle qui va avec.</p>
       </div>
     </section>
 
@@ -54,14 +66,14 @@
           <h2><span class="tri-step">1</span> Ta séance</h2>
         </div>
         <div class="se-fit">
-          <label class="btn btn--ghost se-small-btn se-fit__btn">
+          <button type="button" class="btn btn--ghost se-small-btn se-fit__btn" id="sessionImportBtn">
             <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
-            Importer un fichier .fit
-            <input type="file" id="fitInput" accept=".fit" hidden>
-          </label>
-          <span>ou glisse-le dans la zone de texte ci-dessous</span>
+            Importer une séance
+          </button>
+          <span>ou colle-la ci-dessous</span>
         </div>
         <p class="se-status" id="fitMsg" role="status" hidden></p>
+        <div class="se-imports" id="importList" hidden></div>
         <textarea id="workoutText" class="se-text" rows="10" spellcheck="false" aria-label="Ta séance, une étape par ligne" placeholder="Warm up&#10;21 min @ 06:19-07:22 min/km&#10;&#10;1. Répéter 12 fois&#10;   1. Hard&#10;1 min @ 03:57-04:08 min/km"></textarea>
         <!-- Masqué pour l'instant : choix de l'appli (explications + exemples) et champ VMA.
              Pour les réafficher, retirer ce commentaire : seance.js gère leur absence.
@@ -109,6 +121,13 @@
           <span><i class="se-dot se-dot--hard"></i>Effort</span>
         </div>
         <ol class="se-steps" id="workoutSteps"></ol>
+        <div class="se-export">
+          <button type="button" class="btn btn--ghost se-small-btn se-fit__btn" id="fitWorkoutBtn" disabled>
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="3"/><path d="M9 6l1-3h4l1 3M9 18l1 3h4l1-3M12 10v2l1.5 1"/></svg>
+            Séance pour la montre (.fit)
+          </button>
+          <p class="card__hint" id="fitWorkoutHelp" hidden>Fichier téléchargé : importe-le dans l'appli de ta montre (Coros, Garmin, Polar, Suunto, Wahoo…) ou de ton suivi d'entraînement, si elle accepte les séances au format .fit.</p>
+        </div>
       </div>
 
       <!-- 2. La boucle -->
@@ -158,7 +177,7 @@
           <div class="se-save">
             <input type="text" id="loopName" maxlength="60" placeholder="Nom de la boucle" aria-label="Nom de la boucle">
             <button type="button" class="btn" id="saveLoopBtn">Enregistrer dans mes parcours</button>
-            <button type="button" class="btn btn--ghost" id="gpxLoopBtn">Export GPX</button>
+            <button type="button" class="btn btn--ghost" id="gpxLoopBtn">Télécharger le GPX</button>
           </div>
         </div>
       </div>
@@ -170,9 +189,9 @@
     <span>© <span id="year"></span> Loopace · Tous droits réservés · Utilisation par des IA interdite · Une idée, un bug&nbsp;? <a href="mailto:rotiby@outlook.fr">rotiby@outlook.fr</a></span>
   </footer>
 
-  <script src="script.js?v=142"></script>
+  <script src="script.js?v=152"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="fit.js?v=101"></script>
-  <script src="seance.js?v=142"></script>
+  <script src="fit.js?v=150"></script>
+  <script src="seance.js?v=160"></script>
 </body>
 </html>

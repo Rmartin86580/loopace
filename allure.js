@@ -739,6 +739,23 @@ document.querySelectorAll("[data-goal]").forEach((b) => b.addEventListener("clic
   renderRoutePredict();
 }));
 $("rpRoute").addEventListener("change", renderRoutePredict);
+// Importer un parcours (GPX, TCX, FIT : route-file.js) : il rejoint « Mes parcours » et devient le parcours choisi
+document.querySelectorAll(".js-route-import").forEach((btn) => btn.addEventListener("click", () => openImportDialog({
+  ...ROUTE_IMPORT_TEXT,
+  help: [
+    "Il est ajouté à tes parcours et choisi pour calculer tes temps de passage.",
+    "L'altitude du fichier est reprise ; si elle manque, on la calcule.",
+  ],
+  onFiles: async ([file]) => {
+    const rec = await importRouteFile(file, isBike() ? "bike" : "run");
+    renderRoutePredict(); // remplit la liste des parcours
+    $("rpRoute").value = rec.id;
+    renderRoutePredict();
+    const msg = $("rpImportMsg");
+    msg.hidden = false;
+    msg.textContent = `« ${rec.name} » importé (${fmtNum(rec.distance / 1000, 1)} km) et ajouté à tes parcours.`;
+  },
+})));
 $("rpGoal").addEventListener("input", () => {
   rp.goals[goalKey()] = $("rpGoal").value;
   rp.touched[goalKey()] = true;

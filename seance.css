@@ -162,3 +162,12 @@
   .se-totals { grid-template-columns: minmax(0, 1fr); }
   .se-loop .btn, .se-save .btn { width: 100%; }
 }
+
+/* Plusieurs séances importées d'un coup, et export vers la montre */
+.se-imports { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: .82rem; color: var(--muted); }
+.se-import { border: 1px solid var(--line); background: transparent; color: var(--text); border-radius: 99px; padding: .35em .9em; font: 500 .8rem var(--font-body); cursor: pointer; }
+.se-import:hover { border-color: rgba(var(--accent-rgb), .6); }
+.se-import[aria-pressed="true"] { background: var(--grad); color: var(--on-accent); border-color: transparent; }
+.se-export { display: grid; gap: 8px; justify-items: start; }
+.se-export .ico { width: 18px; height: 18px; }
+.se-result[hidden] { display: none; } /* caché tant qu'aucune boucle n'est tracée */

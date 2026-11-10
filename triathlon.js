@@ -1023,6 +1023,27 @@ for (const id of ["bikeRoute", "runRoute"]) {
     compute();
   });
 }
+// Importer un parcours (GPX, TCX, FIT : route-file.js) pour le vélo ou la course : il rejoint « Mes parcours »
+document.querySelectorAll(".js-route-import").forEach((btn) => btn.addEventListener("click", () => {
+  const leg = btn.dataset.leg;
+  openImportDialog({
+    ...ROUTE_IMPORT_TEXT,
+    title: leg === "bike" ? "Importer le parcours vélo" : "Importer le parcours de course à pied",
+    help: [
+      "Il est ajouté à tes parcours : sa distance et son dénivelé sont repris dans ton plan.",
+      "L'altitude du fichier est reprise ; si elle manque, on la calcule.",
+    ],
+    onFiles: async ([file]) => {
+      const rec = await importRouteFile(file, leg);
+      fillRouteSelects();
+      $(IDS[leg].route).value = rec.id;
+      $(IDS[leg].route).dispatchEvent(new Event("change"));
+      const msg = $(`${leg}ImportMsg`);
+      msg.hidden = false;
+      msg.textContent = `« ${rec.name} » importé (${fmtNum(rec.distance / 1000)} km) et ajouté à tes parcours.`;
+    },
+  });
+}));
 // Un parcours enregistré dans un autre onglet apparaît tout de suite
 window.addEventListener("storage", (e) => {
   if (e.key === ROUTES_KEY) {

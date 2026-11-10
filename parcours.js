@@ -460,7 +460,7 @@ $("gpxBtn").addEventListener("click", () => {
   a.download = `${name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "parcours"}.gpx`;
   a.click();
   URL.revokeObjectURL(a.href);
-  toast("Fichier GPX téléchargé : importe-le dans Garmin Connect, Strava ou ta montre.");
+  toast("Fichier GPX téléchargé : importe-le dans l'appli de ta montre (Coros, Garmin, Polar, Suunto, Wahoo…) ou dans Strava.");
 });
 
 /* ---------- Parcours enregistrés (dans ce navigateur) ---------- */
@@ -565,6 +565,28 @@ $("savedList").addEventListener("click", (e) => {
     map.fitBounds(L.latLngBounds(r.waypoints), { padding: [40, 40] });
   }
 });
+
+/* ---------- Importer un parcours (GPX, TCX, FIT : route-file.js) ----------
+   Le tracé s'ouvre tel quel sur la carte ; ses points restent déplaçables (reliés en ligne droite). */
+async function importRoute(file) {
+  const r = await readRouteFile(file); // erreur de lecture : affichée dans la fenêtre d'import
+  const wps = routeWaypoints(r.points);
+  currentId = null; // pas encore dans « Mes parcours » : à enregistrer
+  $("routeName").value = r.name;
+  if (r.sport) setSport(r.sport, false);
+  savedLine = { waypoints: wps, line: r.points.map(([lat, lng]) => [lat, lng]) };
+  commit(wps);
+  map.fitBounds(L.latLngBounds(savedLine.line), { padding: [40, 40] });
+  toast(`« ${r.name} » importé : vérifie le tracé, puis enregistre-le dans tes parcours.`);
+}
+$("routeImportBtn").addEventListener("click", () => openImportDialog({
+  ...ROUTE_IMPORT_TEXT,
+  help: [
+    "Le tracé s'ouvre sur la carte : tu peux le modifier, puis l'enregistrer dans tes parcours.",
+    "L'altitude du fichier est reprise ; si elle manque, on la calcule.",
+  ],
+  onFiles: ([file]) => importRoute(file),
+}));
 
 /* ---------- Démarrage ---------- */
 setSport("run", false);

@@ -8,15 +8,27 @@
   <meta name="tdm-reservation" content="1">
   <title>Planificateur triathlon — Loopace</title>
   <meta name="description" content="Planifie ton triathlon : natation, transitions, vélo et course. Temps de chaque discipline, temps total et heure d'arrivée, dénivelé de tes parcours compris. Gratuit.">
+  <!-- Vignette de partage (WhatsApp, Facebook, X, LinkedIn…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Loopace">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Planificateur triathlon — Loopace">
+  <meta property="og:description" content="Planifie ton triathlon : natation, transitions, vélo et course. Temps de chaque discipline, temps total et heure d'arrivée, dénivelé de tes parcours compris. Gratuit.">
+  <meta property="og:url" content="https://rmartin86580.github.io/loopace/triathlon.html">
+  <meta property="og:image" content="https://rmartin86580.github.io/loopace/assets/og/triathlon.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Planificateur triathlon — Loopace">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/loopace-icone-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/loopace-icone-192.png">
   <link rel="apple-touch-icon" href="assets/loopace-icone-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=139">
+  <link rel="stylesheet" href="styles.css?v=152">
   <link rel="stylesheet" href="allure.css?v=139">
-  <link rel="stylesheet" href="triathlon.css?v=130">
+  <link rel="stylesheet" href="triathlon.css?v=152">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
   <link rel="stylesheet" href="theme-logo.css?v=142">
   <link rel="stylesheet" href="theme-light.css?v=142">
@@ -166,6 +178,8 @@
               <label for="bikeRoute">Parcours</label>
               <div class="field__input field__input--select"><select id="bikeRoute"></select></div>
               <small id="bikeRouteInfo"></small>
+              <button type="button" class="route-import__link js-route-import" data-leg="bike">Importer un GPX</button>
+              <small class="route-import__msg" id="bikeImportMsg" role="status" hidden></small>
             </div>
           </div>
 
@@ -204,10 +218,12 @@
               <label for="runRoute">Parcours</label>
               <div class="field__input field__input--select"><select id="runRoute"></select></div>
               <small id="runRouteInfo"></small>
+              <button type="button" class="route-import__link js-route-import" data-leg="run">Importer un GPX</button>
+              <small class="route-import__msg" id="runImportMsg" role="status" hidden></small>
             </div>
           </div>
         </div>
-        <p class="card__hint tri-note">Remplis l'allure <strong>ou</strong> le temps : l'autre se calcule tout seul. Parcours : choisis un parcours créé dans l'outil <a href="parcours.html">Parcours</a> pour reprendre sa distance et tenir compte de son dénivelé.</p>
+        <p class="card__hint tri-note">Remplis l'allure <strong>ou</strong> le temps : l'autre se calcule tout seul. Parcours : choisis un parcours créé dans l'outil <a href="parcours.html">Parcours</a> ou importe le GPX de ta course pour reprendre sa distance et tenir compte de son dénivelé.</p>
       </div>
 
       <!-- 3. Résultat -->
@@ -324,7 +340,7 @@
           <p>Une bande de <span id="bandSize"></span> à découper et scotcher au poignet ou à l'avant-bras. Imprime à <strong>100 %</strong> (taille réelle).</p>
           <div class="band-option__actions">
             <button class="btn" id="bandPrint">Imprimer</button>
-            <button class="btn btn--ghost" id="bandDownload">Télécharger (PNG)</button>
+            <button class="btn btn--ghost" id="bandDownload">Télécharger l'image</button>
           </div>
         </div>
       </section>
@@ -334,7 +350,7 @@
           <h3>Fond d'écran</h3>
           <p>Mets-le en fond d'écran de verrouillage : tes passages en un coup d'œil pendant la course. ▲ montée, ▼ descente.</p>
           <div class="band-option__actions">
-            <button class="btn" id="wallDownload">Télécharger (PNG)</button>
+            <button class="btn" id="wallDownload">Télécharger l'image</button>
           </div>
         </div>
       </section>
@@ -346,7 +362,7 @@
     <span>© <span id="year"></span> Loopace · Tous droits réservés · Utilisation par des IA interdite · Une idée, un bug&nbsp;? <a href="mailto:rotiby@outlook.fr">rotiby@outlook.fr</a><span class="tri-gate__lockwrap"> · <button type="button" class="tri-gate__lock" id="triGateLock">Verrouiller l'accès anticipé</button></span></span>
   </footer>
 
-  <script src="script.js?v=142"></script>
+  <script src="script.js?v=152"></script>
   <script>
     // Accès anticipé : on compare l'empreinte du mot de passe tapé, puis on s'en souvient dans ce navigateur
     (function () {
@@ -373,7 +389,9 @@
       });
     })();
   </script>
-  <script src="triathlon.js?v=130"></script>
+  <script src="fit.js?v=150"></script>
+  <script src="route-file.js?v=151"></script>
+  <script src="triathlon.js?v=152"></script>
   <script src="band.js?v=130"></script>
 </body>
 </html>

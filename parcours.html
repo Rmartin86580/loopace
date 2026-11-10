@@ -8,6 +8,18 @@
   <meta name="tdm-reservation" content="1">
   <title>Parcours — Loopace</title>
   <meta name="description" content="Crée tes parcours de course à pied sur la carte : distance, dénivelé, durée estimée et export GPX.">
+  <!-- Vignette de partage (WhatsApp, Facebook, X, LinkedIn…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Loopace">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Parcours — Loopace">
+  <meta property="og:description" content="Crée tes parcours de course à pied sur la carte : distance, dénivelé, durée estimée et export GPX.">
+  <meta property="og:url" content="https://rmartin86580.github.io/loopace/parcours.html">
+  <meta property="og:image" content="https://rmartin86580.github.io/loopace/assets/og/parcours.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Parcours — Loopace">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/loopace-icone-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/loopace-icone-192.png">
   <link rel="apple-touch-icon" href="assets/loopace-icone-180.png">
@@ -15,7 +27,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="styles.css?v=139">
+  <link rel="stylesheet" href="styles.css?v=152">
   <link rel="stylesheet" href="parcours.css?v=130">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
   <link rel="stylesheet" href="theme-logo.css?v=142">
@@ -43,6 +55,13 @@
         <p class="eyebrow">Parcours</p>
         <h1>Trace ta <span class="grad">course</span></h1>
         <p class="panel-hint">Clique sur la carte pour poser ton départ puis tes points de passage. <strong>Clic droit</strong> (appui long sur mobile) : point relié en <strong>ligne droite</strong>, sans suivre les chemins. Glisse un point pour le déplacer, clique dessus pour le supprimer.</p>
+      </div>
+
+      <div class="route-import">
+        <button type="button" class="btn btn--ghost route-import__btn" id="routeImportBtn">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+          Importer un GPX
+        </button>
       </div>
 
       <div class="sport-pick">
@@ -124,8 +143,8 @@
       <div class="save">
         <input type="text" id="routeName" placeholder="Nom du parcours" maxlength="60" aria-label="Nom du parcours">
         <div class="save__actions">
-          <button class="btn" id="saveBtn" disabled>Enregistrer</button>
-          <button class="btn btn--ghost" id="gpxBtn" disabled>Export GPX</button>
+          <button class="btn" id="saveBtn" disabled>Enregistrer dans mes parcours</button>
+          <button class="btn btn--ghost" id="gpxBtn" disabled>Télécharger le GPX</button>
         </div>
       </div>
 
@@ -303,8 +322,10 @@
   <div class="toast" id="toast" role="status"></div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-  <script src="script.js?v=142"></script>
-  <script src="parcours.js?v=142"></script>
+  <script src="script.js?v=152"></script>
+  <script src="fit.js?v=150"></script>
+  <script src="route-file.js?v=151"></script>
+  <script src="parcours.js?v=152"></script>
   <script src="video.js?v=130"></script>
 </body>
 </html>

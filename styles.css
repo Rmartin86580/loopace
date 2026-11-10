@@ -222,3 +222,56 @@ select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
 @media (max-width: 370px) {
   .nav .logo { font-size: 1.05rem; }
 }
+
+/* ===== Importer un parcours (GPX, TCX, FIT) : Parcours, Allure, Triathlon ===== */
+.route-import { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: .82rem; color: var(--muted); }
+.route-import__btn { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.route-import .route-import__btn { padding: .55em 1em; font: 600 .85rem var(--font-body); border: 1px solid var(--line); }
+.route-import__btn .ico { width: 18px; height: 18px; }
+.route-import__link { display: inline-block; margin-top: 6px; padding: 0; border: 0; background: none; font: 600 .8rem var(--font-body); color: var(--pink); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.route-import__link:hover { text-decoration-thickness: 2px; }
+.route-import__msg { display: block; margin: 6px 0 0; font-size: .82rem; color: var(--muted); }
+.route-import__msg.is-error { color: #ff8a8a; }
+[data-theme="light"] .route-import__msg.is-error { color: var(--error); }
+.rp-empty__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+
+/* ===== Fenêtre d'import : glisser-déposer ou parcourir (openImportDialog, script.js) ===== */
+.import-dialog {
+  width: min(560px, 100% - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--black-2);
+  color: var(--text);
+  overflow: auto;
+}
+.import-dialog::backdrop { background: rgba(0, 0, 0, .75); backdrop-filter: blur(6px); }
+.import-dialog__body { display: grid; gap: 16px; padding: clamp(18px, 3vw, 28px); }
+.import-dialog__head { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.import-dialog__head h2 { margin: 0; font-size: clamp(1.25rem, 3vw, 1.5rem); }
+.import-dialog__close { flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font-size: .9rem; }
+.import-dialog__close:hover { border-color: var(--pink); color: var(--pink); }
+.import-dialog__intro { margin: 0; color: var(--muted); font-size: .95rem; }
+.import-drop {
+  display: grid; justify-items: center; gap: 8px;
+  padding: 30px 20px;
+  border: 2px dashed rgba(var(--accent-rgb), .45);
+  border-radius: 18px;
+  background: rgba(var(--accent-rgb), .04);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+}
+.import-drop:hover, .import-drop.is-over { border-color: var(--pink); background: rgba(var(--accent-rgb), .1); }
+.import-drop.is-busy { opacity: .6; pointer-events: none; }
+.import-drop__ico { width: 40px; height: 40px; }
+.import-drop strong { font-size: 1.05rem; }
+.import-drop > span:not(.btn) { font-size: .82rem; color: var(--muted); }
+.import-drop small { font-size: .82rem; color: var(--muted); }
+.import-drop__btn { border: 0; font: 600 .9rem var(--font-body); padding: .7em 1.3em; }
+.import-drop:focus-within { outline: 2px solid var(--pink); outline-offset: 3px; }
+.import-dialog__help { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: .88rem; color: var(--muted); }
+.import-dialog__msg { margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(var(--accent-rgb), .08); font-size: .88rem; }
+.import-dialog__msg.is-error { background: rgba(255, 90, 90, .1); color: #ff8a8a; }
+[data-theme="light"] .import-dialog__msg.is-error { color: var(--error); }

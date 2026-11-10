@@ -8,13 +8,25 @@
   <meta name="tdm-reservation" content="1">
   <title>Calculateur d'allure — Loopace</title>
   <meta name="description" content="Calcule ton allure, ton temps ou ta distance en course à pied, natation et vélo. Temps de passage et prédiction sur ton parcours. Gratuit.">
+  <!-- Vignette de partage (WhatsApp, Facebook, X, LinkedIn…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Loopace">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:title" content="Calculateur d'allure — Loopace">
+  <meta property="og:description" content="Calcule ton allure, ton temps ou ta distance en course à pied, natation et vélo. Temps de passage et prédiction sur ton parcours. Gratuit.">
+  <meta property="og:url" content="https://rmartin86580.github.io/loopace/allure.html">
+  <meta property="og:image" content="https://rmartin86580.github.io/loopace/assets/og/allure.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Calculateur d'allure — Loopace">
+  <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/loopace-icone-32.png">
   <link rel="icon" type="image/png" sizes="192x192" href="assets/loopace-icone-192.png">
   <link rel="apple-touch-icon" href="assets/loopace-icone-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600&family=Exo+2:ital,wght@1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=139">
+  <link rel="stylesheet" href="styles.css?v=152">
   <link rel="stylesheet" href="allure.css?v=139">
   <!-- Thème couleurs du logo : supprimer cette ligne pour revenir au rose d'origine -->
   <link rel="stylesheet" href="theme-logo.css?v=142">
@@ -138,13 +150,20 @@
       <div class="card route-predict">
         <div>
           <h2>Prédire sur mon parcours</h2>
-          <p class="card__hint">Choisis un de tes parcours enregistrés, indique le temps ou l'allure que tu vises : on te donne les temps de passage à chaque kilomètre, en tenant compte des montées et des descentes.</p>
+          <p class="card__hint">Choisis un de tes parcours enregistrés ou importe le GPX de ta course, indique le temps ou l'allure que tu vises : on te donne les temps de passage à chaque kilomètre, en tenant compte des montées et des descentes.</p>
         </div>
 
         <div class="rp-empty" id="rpEmpty" hidden>
           <p id="rpEmptyText">Tu n'as pas encore de parcours enregistré dans ce navigateur.</p>
-          <a class="btn" href="parcours.html">Créer un parcours</a>
+          <div class="rp-empty__actions">
+            <a class="btn" href="parcours.html">Créer un parcours</a>
+            <button type="button" class="btn btn--ghost route-import__btn js-route-import">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="url(#lpGrad)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+              Importer un GPX
+            </button>
+          </div>
         </div>
+        <p class="route-import__msg" id="rpImportMsg" role="status" hidden></p>
 
         <div class="rp-body" id="rpBody">
           <div class="rp-inputs">
@@ -153,6 +172,7 @@
               <div class="field__input field__input--select">
                 <select id="rpRoute"></select>
               </div>
+              <button type="button" class="route-import__link js-route-import">ou importe le GPX de ta course</button>
             </div>
             <div class="field">
               <span class="field__label">Mon objectif</span>
@@ -225,7 +245,7 @@
           <p>Une bande de <span id="bandSize"></span> à découper et scotcher au poignet ou à l'avant-bras. Imprime à <strong>100 %</strong> (taille réelle).</p>
           <div class="band-option__actions">
             <button class="btn" id="bandPrint">Imprimer</button>
-            <button class="btn btn--ghost" id="bandDownload">Télécharger (PNG)</button>
+            <button class="btn btn--ghost" id="bandDownload">Télécharger l'image</button>
           </div>
         </div>
       </section>
@@ -235,7 +255,7 @@
           <h3>Fond d'écran</h3>
           <p>Mets-le en fond d'écran de verrouillage : tes passages en un coup d'œil pendant la course. ▲ montée, ▼ descente.</p>
           <div class="band-option__actions">
-            <button class="btn" id="wallDownload">Télécharger (PNG)</button>
+            <button class="btn" id="wallDownload">Télécharger l'image</button>
           </div>
         </div>
       </section>
@@ -247,8 +267,10 @@
     <span>© <span id="year"></span> Loopace · Tous droits réservés · Utilisation par des IA interdite · Une idée, un bug&nbsp;? <a href="mailto:rotiby@outlook.fr">rotiby@outlook.fr</a></span>
   </footer>
 
-  <script src="script.js?v=142"></script>
-  <script src="allure.js?v=130"></script>
+  <script src="script.js?v=152"></script>
+  <script src="fit.js?v=150"></script>
+  <script src="route-file.js?v=151"></script>
+  <script src="allure.js?v=152"></script>
   <script src="band.js?v=130"></script>
 </body>
 </html>
