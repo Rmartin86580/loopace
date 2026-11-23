@@ -153,6 +153,28 @@ const ROUTE_IMPORT_TEXT = {
   accept: ".gpx,.tcx,.fit",
 };
 
+// Enregistrement bloqué par le navigateur : on le dit clairement plutôt que de perdre les données sans rien dire
+(function checkStorage() {
+  let ok = false;
+  try {
+    const k = "loopace-test";
+    localStorage.setItem(k, "1");
+    ok = localStorage.getItem(k) === "1";
+    localStorage.removeItem(k);
+  } catch { /* bloqué */ }
+  if (ok) {
+    // Demande au navigateur de ne pas effacer les données de lui-même quand l'espace manque
+    try { navigator.storage?.persist?.(); } catch { /* sans importance */ }
+    return;
+  }
+  const bar = document.createElement("div");
+  bar.className = "storage-warn";
+  bar.setAttribute("role", "alert");
+  bar.innerHTML = `<p><strong>Ton navigateur bloque l'enregistrement sur ce site.</strong> Tes parcours et tes séances ne seront pas gardés. Dans Chrome : clique sur l'icône à gauche de l'adresse › <em>Paramètres du site</em> › autorise <em>Cookies et données des sites</em>. Si tu es en navigation privée, ouvre Loopace dans une fenêtre normale.</p><button type="button" class="storage-warn__close" aria-label="Fermer">×</button>`;
+  bar.querySelector("button").addEventListener("click", () => bar.remove());
+  document.body.append(bar);
+})();
+
 // Apparition des éléments au défilement
 const observer = new IntersectionObserver(
   (entries) => entries.forEach((e) => {

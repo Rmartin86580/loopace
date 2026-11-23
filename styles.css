@@ -232,7 +232,7 @@ select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
 .route-import__link:hover { text-decoration-thickness: 2px; }
 .route-import__msg { display: block; margin: 6px 0 0; font-size: .82rem; color: var(--muted); }
 .route-import__msg.is-error { color: #ff8a8a; }
-[data-theme="light"] .route-import__msg.is-error { color: var(--error); }
+[data-theme="light"] .route-import__msg.is-error { color: var(--error, #c62828); }
 .rp-empty__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 
 /* ===== Fenêtre d'import : glisser-déposer ou parcourir (openImportDialog, script.js) ===== */
@@ -274,4 +274,13 @@ select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
 .import-dialog__help { margin: 0; padding-left: 1.1em; display: grid; gap: 6px; font-size: .88rem; color: var(--muted); }
 .import-dialog__msg { margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(var(--accent-rgb), .08); font-size: .88rem; }
 .import-dialog__msg.is-error { background: rgba(255, 90, 90, .1); color: #ff8a8a; }
-[data-theme="light"] .import-dialog__msg.is-error { color: var(--error); }
+[data-theme="light"] .import-dialog__msg.is-error { color: var(--error, #c62828); }
+
+/* Bandeau : enregistrement bloqué par le navigateur */
+.storage-warn { position: fixed; z-index: 60; left: 16px; right: 16px; bottom: 16px; max-width: 760px; margin: 0 auto; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--black-2); border: 1px solid #ff8a8a; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+.storage-warn p { margin: 0; font-size: .9rem; color: var(--text); }
+.storage-warn strong { color: #ff8a8a; }
+.storage-warn__close { flex: none; width: 32px; height: 32px; border: 0; border-radius: 50%; background: transparent; color: var(--text); font-size: 1.4rem; line-height: 1; cursor: pointer; }
+.storage-warn__close:hover { background: rgba(var(--accent-rgb), .12); }
+[data-theme="light"] .storage-warn { border-color: var(--error, #c62828); }
+[data-theme="light"] .storage-warn strong { color: var(--error, #c62828); }
