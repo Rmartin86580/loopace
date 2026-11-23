@@ -1079,6 +1079,7 @@ $("loopKm").addEventListener("input", () => {
    ========================================================= */
 const map = L.map("map", { zoomControl: false }).setView([46.6, 2.4], 6);
 L.control.zoom({ position: "bottomright" }).addTo(map);
+rememberMapView(map);
 const OSM = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 const streetUrl = location.protocol.startsWith("http")
   ? "https://tile.openstreetmap.org/{z}/{x}/{y}.png"

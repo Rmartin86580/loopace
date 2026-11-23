@@ -284,3 +284,5 @@ select optgroup { color: var(--pink); font-style: normal; font-weight: 700; }
 .storage-warn__close:hover { background: rgba(var(--accent-rgb), .12); }
 [data-theme="light"] .storage-warn { border-color: var(--error, #c62828); }
 [data-theme="light"] .storage-warn strong { color: var(--error, #c62828); }
+
+.nav__link[hidden] { display: none; }

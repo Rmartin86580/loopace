@@ -40,6 +40,7 @@ function fitLayout() {
 /* ---------- Carte ---------- */
 const map = L.map("map", { zoomControl: false, doubleClickZoom: false }).setView([46.6, 2.4], 6);
 L.control.zoom({ position: "bottomright" }).addTo(map);
+rememberMapView(map);
 
 // Les tuiles d'openstreetmap.org sont refusées sans en-tête Referer, ce qui arrive quand
 // la page est ouverte en double-cliquant le fichier (file://) : on passe alors sur les

@@ -299,3 +299,15 @@ td.grade.down { color: #7dd3c0; }
 
 /* Arrivée depuis l'outil Parcours : le titre ne passe pas sous la barre de menu */
 #routeSection { scroll-margin-top: 72px; }
+
+/* Choix en haut de page : sur un parcours (le point fort) ou calcul simple */
+.tool-hero p:has(+ .tool-choice) { max-width: 560px; margin: 0 auto; }
+.tool-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 560px; margin: 28px auto 0; }
+.tool-choice__item { display: grid; gap: 4px; padding: 16px 18px; border-radius: 16px; border: 1px solid var(--line); background: var(--black-2); color: var(--text); text-align: left; text-decoration: none; transition: border-color .2s, transform .2s; }
+.tool-choice__item:hover { border-color: var(--pink); transform: translateY(-2px); }
+.tool-choice__item strong { font-size: 1rem; }
+.tool-choice__item span { font-size: .85rem; color: var(--muted); }
+.tool-choice__item--main { background: var(--pink); border-color: var(--pink); color: var(--on-accent); }
+.tool-choice__item--main span { color: var(--on-accent); opacity: .8; }
+#calcSection, #routeSection { scroll-margin-top: 84px; }
+@media (max-width: 480px) { .tool-choice { grid-template-columns: 1fr; } }

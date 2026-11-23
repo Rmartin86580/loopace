@@ -33,6 +33,25 @@ function accentRgba(alpha, hex = ACCENT) {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${alpha})`;
 }
 
+// Triathlon : page privée. Son lien n'apparaît que dans un navigateur où le mot de passe a déjà été entré.
+try {
+  if (localStorage.getItem("loopace-tri-access")) document.querySelectorAll("[data-tri]").forEach((el) => { el.hidden = false; });
+} catch { /* stockage indisponible */ }
+
+// Cartes : on rouvre là où tu étais la dernière fois (plutôt que sur toute la France)
+const MAP_VIEW_KEY = "loopace-carte";
+function rememberMapView(map) {
+  try {
+    const v = JSON.parse(localStorage.getItem(MAP_VIEW_KEY));
+    if (v && Number.isFinite(v.lat) && Number.isFinite(v.lng)) map.setView([v.lat, v.lng], v.z || 13);
+  } catch { /* rien d'enregistré */ }
+  map.on("moveend", () => {
+    if (map.getZoom() < 10) return; // vue d'ensemble : on garde la dernière vue « locale »
+    const c = map.getCenter();
+    try { localStorage.setItem(MAP_VIEW_KEY, JSON.stringify({ lat: +c.lat.toFixed(4), lng: +c.lng.toFixed(4), z: map.getZoom() })); } catch { /* stockage indisponible */ }
+  });
+}
+
 // Thème clair / sombre : bouton dans le menu, choix gardé pour la prochaine visite
 (function themeToggle() {
   const links = document.querySelector(".nav__links");

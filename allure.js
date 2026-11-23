@@ -794,3 +794,8 @@ renderRoutePredict();
 /* ---------- Bracelet d'allure (dessin et fenêtre : band.js) ---------- */
 $("bandBtn").addEventListener("click", () => openBand(rp.last));
 $("calcBandBtn").addEventListener("click", () => openBand(calcPlan));
+
+// « Sur mon parcours » depuis le haut de page : en natation la section est masquée, on repasse en course
+document.querySelector(".tool-choice__item--main")?.addEventListener("click", () => {
+  if ($("routeSection").hidden) document.querySelector('[data-sport="run"]')?.click();
+});
